@@ -2,7 +2,8 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#5B3DF5">
 <title>🎟️ Pasaporte Feria del Colegio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -29,6 +30,7 @@
     margin: 0;
     padding: 24px 14px;
     min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -150,7 +152,7 @@
     transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
   }
 
-  .input-telefono::placeholder { color: #AAA5B7; }
+  .input-telefono::placeholder { color: #756F89; }
 
   .input-telefono:focus {
     border-color: var(--color-primario);
@@ -296,8 +298,8 @@
   }
 
   .pista-cerrar {
-    font-size: 12px;
-    color: #9C97AC;
+    font-size: 13px;
+    color: #6D6980;
     margin-top: 14px;
   }
 
@@ -316,7 +318,7 @@
     display: grid;
     gap: 10px;
     margin: 22px 0 20px;
-    padding: 40px 12px 14px;
+    padding: 12px 12px 14px;
     background:
       radial-gradient(circle at 20% 25%, rgba(91,61,245,.05) 0 2px, transparent 3px),
       radial-gradient(circle at 80% 70%, rgba(255,107,53,.05) 0 2px, transparent 3px),
@@ -324,30 +326,6 @@
     border: 2px dashed #8C7FB7;
     border-radius: 14px;
     box-shadow: inset 0 0 0 5px rgba(255,255,255,.55);
-  }
-
-  .pasaporte::before {
-    content: "✦  PASAPORTE DE LA FERIA  ✦";
-    position: absolute;
-    left: 10px;
-    right: 10px;
-    top: 10px;
-    font-family: 'Baloo 2', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    color: #3B2B72;
-    letter-spacing: .7px;
-  }
-
-  .pasaporte::after {
-    content: "SELLOS";
-    position: absolute;
-    top: 11px;
-    right: 14px;
-    font-size: 8px;
-    font-weight: 800;
-    color: #9A91B3;
-    letter-spacing: 1.4px;
   }
 
   .casillero {
@@ -363,20 +341,9 @@
   .casillero.vacio {
     border: 2px dashed #BDB4D3;
     background: rgba(255,255,255,.72);
-    color: #A9A1BA;
+    color: #6F678A;
     font-size: 24px;
     font-weight: 700;
-  }
-
-  .casillero.vacio::after {
-    content: "FALTA";
-    position: absolute;
-    bottom: 5px;
-    left: 0;
-    right: 0;
-    font-size: 7px;
-    letter-spacing: 1px;
-    color: #B5ADC6;
   }
 
   .casillero.lleno {
@@ -423,7 +390,7 @@
     right: 12px;
     font-size: 11px;
     font-weight: 700;
-    color: #C9C3DC;
+    color: #8D87A3;
     letter-spacing: .3px;
     pointer-events: none;
   }
@@ -489,10 +456,27 @@
     font-size: 16px;
     margin: 0;
   }
+
+  .solo-lector { position:absolute; width:1px; height:1px; margin:-1px; padding:0; border:0; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+  .tarjeta.compacta .logo-envoltorio { width:60px; height:60px; margin:0 auto 12px; padding:3px; }
+  .tarjeta.compacta .logo { border-width:3px; }
+  .tarjeta.compacta .barra-superior { display:none; }
+  .pasaporte-cab { grid-column:1 / -1; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:6px 8px; text-align:left; }
+  .pasaporte-tit { font-family:'Baloo 2', sans-serif; font-size:15px; font-weight:700; color:#3B2B72; letter-spacing:.5px; }
+  .pasaporte-cont { font-size:13px; font-weight:700; color:#4B4270; background:#F0ECFF; border:1px solid #DDD5FF; padding:2px 10px; border-radius:999px; white-space:nowrap; }
+  .ayuda-campo { font-size:13px; color:#6D6980; text-align:left; margin:3px 2px 0; }
+  .error-campo { font-size:13px; font-weight:700; color:#A31E1E; text-align:left; margin:4px 2px 0; }
+  .error-campo:empty { display:none; }
+  .input-telefono.invalido { border-color:#D64545; }
+  .nota-privacidad { font-size:13px; color:#6D6980; margin:16px 0 0; }
+  .perfil-recordado { font-size:17px; color:#3B2B72; background:#F0ECFF; border:1px solid #DDD5FF; border-radius:14px; padding:12px 14px; margin:6px 0 4px; }
+  .exito small { display:block; font-size:15px; font-weight:600; margin-top:6px; }
+  .boton-principal:focus-visible, .boton-secundario:focus-visible { outline:3px solid #FFB020; outline-offset:3px; }
 </style>
 </head>
 <body>
   <canvas id="fireworksCanvas"></canvas>
+  <div id="anuncio" class="solo-lector" role="status" aria-live="polite"></div>
 
   <div class="loader-overlay" id="loaderOverlay">
     <div class="loader-circulo">
@@ -529,7 +513,7 @@ const API_URL = "https://script.google.com/macros/s/AKfycbxQchCtqbJ5gkovFnrD5MRL
 /* Número de versión de la página. Se muestra chiquito en la pantalla del
  * Punto 1 (abajo a la derecha de la tarjeta). Cambialo acá con cada
  * actualización que subas. */
-const APP_VERSION = "V2.0";
+const APP_VERSION = "V2.1";
 
 /* Imágenes de sello por punto. Poné los archivos en site/img/ con estos
  * nombres, o cambiá las rutas acá. Si un punto no tiene imagen, se muestra
@@ -604,7 +588,7 @@ async function init() {
     finalizarCarga(inicioCarga, renderFormulario);
   } catch (err) {
     finalizarCarga(inicioCarga, () => {
-      contenido.innerHTML = `<p class="error-carga">No se pudo conectar con el servidor.\n\n${escapeHtml(err.message)}</p>
+      contenido.innerHTML = `<p class="error-carga" role="alert">${escapeHtml(mensajeError(err))}</p>
         <button type="button" class="boton-secundario" onclick="location.reload()">Reintentar</button>`;
     });
   }
@@ -618,37 +602,94 @@ function mensajeUbicacion(p) {
   return (CONFIG.mensajesUbicacion && CONFIG.mensajesUbicacion[p]) || "";
 }
 
-function renderFormulario() {
-  const esPrimerPunto = punto === 1;
-  contenido.innerHTML = `
-    <h2>${nombrePunto(punto)}</h2>
-    <p class="subtitulo">${esPrimerPunto ? "Ingresá tus datos para empezar tu pasaporte." : "Ingresá tu número de teléfono para sellar tu pasaporte."}</p>
-    <form id="formSello">
-      <label class="etiqueta-campo" for="campoTelefono">Número de teléfono</label>
-      <input id="campoTelefono" type="tel" name="telefono" placeholder="Ej: 1122334455" required
-             inputmode="numeric" pattern="[0-9]*" maxlength="12" class="input-telefono"
-             oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,12)">
-      ${esPrimerPunto ? `
-      <label class="etiqueta-campo" for="campoNombre">Nombre y apellido</label>
-      <input id="campoNombre" type="text" name="nombre" placeholder="Ej: Juan Pérez" required
-             maxlength="30" class="input-telefono"
-             oninput="filtrarNombre(this)">` : ""}
-      <button type="submit" id="btnSellar" class="boton-principal">Sellar</button>
-    </form>
-  `;
-  document.getElementById("formSello").addEventListener("submit", onSubmitFormulario);
+const CLAVE_PERFIL = "pasaporte_perfil";
+function leerPerfil() { try { const p = JSON.parse(localStorage.getItem(CLAVE_PERFIL) || "null"); return p && p.telefono ? p : null; } catch (e) { return null; } }
+function guardarPerfil(p) { try { localStorage.setItem(CLAVE_PERFIL, JSON.stringify(p)); } catch (e) {} }
+function olvidarPerfil() { try { localStorage.removeItem(CLAVE_PERFIL); } catch (e) {} }
 
-  const versionTag = document.getElementById("versionTag");
+function byId(id) { return document.getElementById(id); }
+function enmascarar(tel) { return "…" + String(tel).slice(-4); }
+
+/* Texto para lectores de pantalla (región aria-live #anuncio). */
+function anunciar(texto) {
+  const a = byId("anuncio");
+  if (!a) return;
+  a.textContent = "";
+  setTimeout(() => { a.textContent = texto; }, 60);
+}
+function anunciarResultado() {
+  const t = Array.from(contenido.querySelectorAll(".aviso,.exito,.proxima-parada,.ubicacion"))
+    .map(e => e.textContent.replace(/\s+/g, " ").trim()).join(" ");
+  if (t) anunciar(t);
+}
+
+/* Nunca mostramos errores técnicos crudos ("Failed to fetch", etc.). */
+function mensajeError(err) {
+  const m = String((err && err.message) || "");
+  if (!m || /failed to fetch|network|load failed|typeerror|json|unexpected token|abort/i.test(m)) {
+    return "No pudimos conectarnos. Revisá tu señal e intentá de nuevo.";
+  }
+  return m;
+}
+
+function renderFormulario(forzarFormulario) {
+  tarjeta.classList.remove("compacta");
+  const esPrimerPunto = punto === 1;
+  const perfil = (!esPrimerPunto && forzarFormulario !== true) ? leerPerfil() : null;
+  const nota = `<p class="nota-privacidad">Usamos tu número solo para el sorteo.</p>`;
+
+  if (perfil) {
+    const nom = primerNombre(perfil.nombre);
+    contenido.innerHTML = `
+      <h2>${escapeHtml(nombrePunto(punto))}</h2>
+      <p class="subtitulo">Sellá tu pasaporte con un toque.</p>
+      <p class="perfil-recordado">${nom ? "<b>" + escapeHtml(nom) + "</b> · " : ""}teléfono terminado en <b>${enmascarar(perfil.telefono)}</b></p>
+      <button type="button" id="btnAtajo" class="boton-principal">Sellar mi pasaporte</button>
+      <button type="button" id="btnNoSoy" class="boton-secundario">No soy yo / usar otro número</button>
+      ${nota}`;
+    byId("btnAtajo").addEventListener("click", () => enviarSello(perfil.telefono, "", "atajo"));
+    byId("btnNoSoy").addEventListener("click", () => { olvidarPerfil(); renderFormulario(true); });
+  } else {
+    contenido.innerHTML = `
+      <h2>${escapeHtml(nombrePunto(punto))}</h2>
+      <p class="subtitulo">${esPrimerPunto ? "Ingresá tus datos para empezar tu pasaporte." : "Ingresá tu número de teléfono para sellar tu pasaporte."}</p>
+      <form id="formSello" novalidate>
+        <label class="etiqueta-campo" for="campoTelefono">Número de teléfono</label>
+        <input id="campoTelefono" type="tel" name="telefono" placeholder="Ej: 1122334455" required
+               autocomplete="tel-national" inputmode="numeric" pattern="[0-9]*" maxlength="12" class="input-telefono"
+               aria-describedby="campoTelefonoAyuda campoTelefonoError"
+               oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,12)">
+        <p class="ayuda-campo" id="campoTelefonoAyuda">Con código de área, sin 0 ni 15.</p>
+        <p class="error-campo" id="campoTelefonoError" role="alert"></p>
+        ${esPrimerPunto ? `
+        <label class="etiqueta-campo" for="campoNombre">Nombre y apellido</label>
+        <input id="campoNombre" type="text" name="nombre" placeholder="Ej: Juan Pérez" required
+               autocomplete="name" maxlength="40" class="input-telefono"
+               aria-describedby="campoNombreError"
+               oninput="filtrarNombre(this)">
+        <p class="error-campo" id="campoNombreError" role="alert"></p>` : ""}
+        <button type="submit" id="btnSellar" class="boton-principal">Sellar mi pasaporte</button>
+      </form>
+      ${nota}`;
+    byId("formSello").addEventListener("submit", onSubmitFormulario);
+    ["campoTelefono", "campoNombre"].forEach(id => {
+      const el = byId(id);
+      if (el) el.addEventListener("input", () => mostrarErrorCampo(id, ""));
+    });
+  }
+
+  const versionTag = byId("versionTag");
   if (versionTag) {
     versionTag.textContent = APP_VERSION;
     versionTag.style.display = "block";
   }
 }
 
+/* Permite letras (con acentos), espacios, apóstrofo y guion: D'Angelo, María-José. */
 function filtrarNombre(el) {
   const inicioCursor = el.selectionStart;
   const valorOriginal = el.value;
-  const valorLimpio = valorOriginal.replace(/[^A-Za-zÀ-ÖØ-öø-ÿ\s]/g, "").slice(0, 30);
+  const valorLimpio = valorOriginal.replace(/[^A-Za-zÀ-ÖØ-öø-ÿ\s'’-]/g, "").slice(0, 40);
   if (valorLimpio === valorOriginal) return;
   const diferencia = valorOriginal.length - valorLimpio.length;
   el.value = valorLimpio;
@@ -656,15 +697,49 @@ function filtrarNombre(el) {
   el.setSelectionRange(nuevaPos, nuevaPos);
 }
 
-async function onSubmitFormulario(ev) {
-  ev.preventDefault();
-  const telefono = document.getElementById("campoTelefono").value.trim();
-  const nombreEl = document.getElementById("campoNombre");
-  const nombre = nombreEl ? nombreEl.value.trim() : "";
+function mostrarErrorCampo(id, msg) {
+  const el = byId(id), err = byId(id + "Error");
+  if (!el || !err) return;
+  err.textContent = msg;
+  el.setAttribute("aria-invalid", msg ? "true" : "false");
+  el.classList.toggle("invalido", !!msg);
+}
 
-  const btn = document.getElementById("btnSellar");
+function validarFormulario() {
+  let primero = null;
+  const tel = byId("campoTelefono");
+  const errTel = tel.value.trim().length < 10 ? "Ingresá tu número completo: código de área + número, 10 dígitos." : "";
+  mostrarErrorCampo("campoTelefono", errTel);
+  if (errTel) primero = tel;
+
+  const nom = byId("campoNombre");
+  if (nom) {
+    const letras = nom.value.replace(/[^A-Za-zÀ-ÖØ-öø-ÿ]/g, "").length;
+    const errNom = letras < 2 ? "Ingresá tu nombre y apellido." : "";
+    mostrarErrorCampo("campoNombre", errNom);
+    if (errNom && !primero) primero = nom;
+  }
+  if (primero) primero.focus();
+  return !primero;
+}
+
+function onSubmitFormulario(ev) {
+  ev.preventDefault();
+  if (!validarFormulario()) return;
+  const telefono = byId("campoTelefono").value.trim();
+  const nombreEl = byId("campoNombre");
+  enviarSello(telefono, nombreEl ? nombreEl.value.trim() : "", "form");
+}
+
+async function enviarSello(telefono, nombre, origen) {
+  const btn = byId(origen === "form" ? "btnSellar" : "btnAtajo");
   btn.disabled = true;
   btn.innerHTML = `<span class="spinner"></span> Procesando...`;
+  /* Apps Script puede tardar varios segundos: avisamos que sigue trabajando. */
+  const avisoLento = setTimeout(() => {
+    btn.innerHTML = `<span class="spinner"></span> Sigue conectando...`;
+    anunciar("Sigue conectando, un momento.");
+  }, 4000);
 
   try {
     const qs = new URLSearchParams({ action: "sellar", punto: String(punto), telefono });
@@ -672,13 +747,24 @@ async function onSubmitFormulario(ev) {
 
     const res = await fetch(`${API_URL}?${qs.toString()}`);
     const data = await res.json();
-
     if (data.error) throw new Error(data.error);
 
+    const previo = leerPerfil();
+    guardarPerfil({
+      telefono,
+      nombre: nombre || data.nombre || (previo && previo.telefono === telefono ? previo.nombre : "")
+    });
     renderResultado(data);
   } catch (err) {
-    contenido.innerHTML = `<p class="error-carga">No se pudo procesar el sello.\n\n${escapeHtml(err.message)}</p>
-      <button type="button" class="boton-secundario" onclick="location.reload()">Volver a intentar</button>`;
+    /* Volvemos al formulario conservando lo que la persona había escrito. */
+    renderFormulario(origen === "form");
+    if (origen === "form") {
+      const t = byId("campoTelefono"); if (t) t.value = telefono;
+      const n = byId("campoNombre");   if (n) n.value = nombre;
+    }
+    contenido.insertAdjacentHTML("afterbegin", `<p class="error-carga" role="alert">${escapeHtml(mensajeError(err))}</p>`);
+  } finally {
+    clearTimeout(avisoLento);
   }
 }
 
@@ -692,18 +778,19 @@ function elegirAlAzar(opciones) {
 }
 
 function renderPasaporte(sellos, puntoNuevo) {
-  let html = `<div class="pasaporte" style="grid-template-columns:repeat(${CONFIG.totalPuntos},1fr);">`;
+  const hechos = sellos.filter(Boolean).length;
+  let html = `<div class="pasaporte" role="group" aria-label="Tu pasaporte: ${hechos} de ${sellos.length} sellos" style="grid-template-columns:repeat(${CONFIG.totalPuntos},1fr);"><div class="pasaporte-cab" aria-hidden="true"><span class="pasaporte-tit">PASAPORTE DE LA FERIA</span><span class="pasaporte-cont">${hechos} de ${sellos.length} sellos</span></div>`;
   sellos.forEach((lleno, i) => {
     const p = i + 1;
     if (lleno) {
       const esNuevo = p === puntoNuevo;
       const src = IMAGENES_SELLO[p];
       const contenidoCasillero = src
-        ? `<img src="${src}" alt="Sello ${p}" onerror="this.parentElement.innerHTML='<span class=&quot;check&quot;>✓</span>'">`
+        ? `<img src="${src}" alt="" onerror="this.parentElement.innerHTML='<span class=&quot;check&quot;>✓</span>'">`
         : `<span class="check">✓</span>`;
-      html += `<div class="casillero lleno${esNuevo ? " nuevo" : ""}">${contenidoCasillero}</div>`;
+      html += `<div class="casillero lleno${esNuevo ? " nuevo" : ""}" role="img" aria-label="Sello ${p}: completado">${contenidoCasillero}</div>`;
     } else {
-      html += `<div class="casillero vacio"><span>${p}</span></div>`;
+      html += `<div class="casillero vacio" role="img" aria-label="Sello ${p}: pendiente"><span aria-hidden="true">${p}</span></div>`;
     }
   });
   return html + `</div>`;
@@ -852,12 +939,18 @@ function playFireworksSound() {
   freqs.forEach((f, i) => _successTone(ctx, f, t + i * 0.28, 0.35, { type: "square", gain: 0.06 }));
 }
 
+/* Todas las pantallas de resultado usan el mismo encabezado compacto. */
 function ocultarEncabezado() {
-  document.getElementById("logoEnvoltorio").style.display = "none";
-  document.getElementById("barraSuperior").style.display = "none";
+  tarjeta.classList.add("compacta");
 }
 
 function renderResultado(r) {
+  ocultarEncabezado();
+  _renderResultado(r);
+  anunciarResultado();
+}
+
+function _renderResultado(r) {
   const versionTagEl = document.getElementById("versionTag");
   if (versionTagEl) versionTagEl.style.display = "block";
   const nombreActual = nombrePunto(punto);
@@ -872,13 +965,13 @@ function renderResultado(r) {
     const lineaUbicacion = ubic ? `<p class="ubicacion">${ICONO_UBICACION}${ubic}</p>` : "";
 
     if (r.motivo === "debe_empezar_por_1") {
-      html += `<p class="aviso">🚀 ¡Epa! Todavía no arrancaste tu pasaporte. Empezá por el <b>${nombrePunto(1)}</b> para sumar tu primer sello</p>${lineaUbicacion}`;
+      html += `<p class="aviso">¡Epa! Todavía no arrancaste tu pasaporte. Empezá por el <b>${nombrePunto(1)}</b> para sumar tu primer sello</p>${lineaUbicacion}`;
     } else if (r.motivo === "ya_tenia_este_punto") {
-      html += `<p class="aviso" style="font-size:17px;">${saludo}¡Ese ya lo tenés guardado! 😄<br>Seguí para el <b>${nombrePendiente}</b></p>${lineaUbicacion}`;
+      html += `<p class="aviso" style="font-size:17px;">${saludo}¡Ese ya lo tenés guardado!<br>Seguí para el <b>${nombrePendiente}</b></p>${lineaUbicacion}`;
     } else if (r.motivo === "orden_incorrecto") {
       html += `<p class="aviso">${saludo}¡Epa, en orden! Primero el <b>${nombrePendiente}</b> y después seguimos</p>${lineaUbicacion}`;
     }
-    html += `<p class="pista-cerrar">📱 Podés cerrar esta pestaña y escanear el próximo QR cuando quieras</p>`;
+    html += `<p class="pista-cerrar">Podés cerrar esta pestaña y escanear el próximo QR cuando quieras</p>`;
     contenido.innerHTML = html;
     reproducirSonidoError();
     return;
@@ -891,19 +984,18 @@ function renderResultado(r) {
   if (r.yaEstabaCompletoAntes) {
     html += renderPasaporte(r.sellos, null);
     html += `<p class="exito">🎉 ${saludo}ya habías completado todo el recorrido. ${mensajeFinal}</p>`;
-    html += `<p class="pista-cerrar">📱 Ya podés cerrar esta pestaña</p>`;
+    html += `<p class="pista-cerrar">Ya podés cerrar esta pestaña</p>`;
     contenido.innerHTML = html;
     return;
   }
 
   html += renderPasaporte(r.sellos, r.puntoRecienGuardado);
-  html += `<p class="exito exito-principal">😃 ${saludo}¡sello de <b>${nombreActual}</b> registrado!</p>`;
+  const lineaSello = `${saludo}¡sello de <b>${nombreActual}</b> registrado!`;
+  if (!r.completo) html += `<p class="exito exito-principal">${lineaSello}</p>`;
 
   if (r.completo) {
-    html += r.anotadoAhora
-      ? `<p class="exito exito-principal">🎉 ¡Completaste el recorrido!</p><p class="exito">${mensajeFinal}</p>`
-      : `<p class="exito exito-principal">🎉 ${mensajeFinal}</p>`;
-    html += `<p class="pista-cerrar">📱 Ya podés cerrar esta pestaña</p>`;
+    html += `<div class="exito exito-principal">🎉 ¡Completaste el recorrido!<small>${lineaSello}</small><small>${mensajeFinal}</small></div>`;
+    html += `<p class="pista-cerrar">Ya podés cerrar esta pestaña</p>`;
   } else {
     const proximoPendiente = r.puntoRecienGuardado ? r.puntoRecienGuardado + 1 : null;
     if (proximoPendiente && proximoPendiente <= CONFIG.totalPuntos) {
@@ -914,7 +1006,7 @@ function renderResultado(r) {
         html += `<p class="ubicacion">${ICONO_UBICACION}${ubic}</p>`;
       }
     }
-    html += `<p class="pista-cerrar">📱 Podés cerrar esta pestaña y escanear el próximo QR cuando quieras</p>`;
+    html += `<p class="pista-cerrar">Podés cerrar esta pestaña y escanear el próximo QR cuando quieras</p>`;
   }
 
   contenido.innerHTML = html;
