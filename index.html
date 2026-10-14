@@ -229,9 +229,9 @@
   }
 
   .aviso {
-    background: #FCEAEA;
-    color: #A31E1E;
-    border: 1px solid #F0B3B3;
+    background: #FFF6E0;
+    color: #6B4A00;
+    border: 1px solid #F3D58A;
   }
 
   .exito {
@@ -477,6 +477,12 @@
   .perfil-tel b { color:#33256D; }
   .exito small { display:block; font-size:15px; font-weight:600; margin-top:6px; }
   .boton-principal:focus-visible, .boton-secundario:focus-visible { outline:3px solid #FFB020; outline-offset:3px; }
+
+  .paso-punto { display:inline-block; font-size:13px; font-weight:700; color:#4B4270; background:#F0ECFF; border:1px solid #DDD5FF; padding:3px 12px; border-radius:999px; margin:0 0 8px; }
+  .paso-puntos { display:flex; justify-content:center; align-items:center; gap:6px; margin:0 0 10px; }
+  .paso-puntos i { width:8px; height:8px; border-radius:50%; background:#DDD5FF; }
+  .paso-puntos i.previo { background:#A99BF5; }
+  .paso-puntos i.actual { background:#5B3DF5; transform:scale(1.4); }
 </style>
 </head>
 <body>
@@ -518,7 +524,7 @@ const API_URL = "https://script.google.com/macros/s/AKfycbxQchCtqbJ5gkovFnrD5MRL
 /* Número de versión de la página. Se muestra chiquito en la pantalla del
  * Punto 1 (abajo a la derecha de la tarjeta). Cambialo acá con cada
  * actualización que subas. */
-const APP_VERSION = "V2.2";
+const APP_VERSION = "V2.3";
 
 /* Imágenes de sello por punto. Poné los archivos en site/img/ con estos
  * nombres, o cambiá las rutas acá. Si un punto no tiene imagen, se muestra
@@ -637,6 +643,14 @@ function mensajeError(err) {
   return m;
 }
 
+/* "Punto 2 de 5" + posición en el recorrido. */
+function indicadorPunto() {
+  const total = CONFIG.totalPuntos;
+  let dots = "";
+  for (let i = 1; i <= total; i++) dots += `<i class="${i < punto ? "previo" : i === punto ? "actual" : ""}"></i>`;
+  return `<p class="paso-punto">Punto ${punto} de ${total}</p><div class="paso-puntos" aria-hidden="true">${dots}</div>`;
+}
+
 function renderFormulario(forzarFormulario) {
   tarjeta.classList.remove("compacta");
   const esPrimerPunto = punto === 1;
@@ -647,6 +661,7 @@ function renderFormulario(forzarFormulario) {
     const nom = primerNombre(perfil.nombre);
     const inicial = nom ? Array.from(nom)[0].toUpperCase() : "";
     contenido.innerHTML = `
+      ${indicadorPunto()}
       <h2>${escapeHtml(nombrePunto(punto))}</h2>
       <p class="subtitulo">Sellá tu pasaporte con un toque.</p>
       <div class="perfil-recordado">
@@ -663,6 +678,7 @@ function renderFormulario(forzarFormulario) {
     byId("btnNoSoy").addEventListener("click", () => { olvidarPerfil(); renderFormulario(true); });
   } else {
     contenido.innerHTML = `
+      ${indicadorPunto()}
       <h2>${escapeHtml(nombrePunto(punto))}</h2>
       <p class="subtitulo">${esPrimerPunto ? "Ingresá tus datos para empezar tu pasaporte." : "Ingresá tu número de teléfono para sellar tu pasaporte."}</p>
       <form id="formSello" novalidate>
@@ -841,6 +857,15 @@ function reproducirSonidoAcierto() {
 
 // Sonido de error tipo "botón equivocado": dos tonos cortos y graves que
 // bajan de altura, como un buzzer de interfaz.
+/* Aviso amistoso (no es un error): una sola nota suave y vibración corta. */
+function reproducirSonidoAviso() {
+  try {
+    const ctx = _getSuccessAudioCtx();
+    if (ctx) _successTone(ctx, 660, ctx.currentTime, 0.22, { type: "sine", gain: 0.1 });
+  } catch (e) { /* sin audio, no pasa nada */ }
+  vibrar([25]);
+}
+
 function reproducirSonidoError() {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -985,7 +1010,7 @@ function _renderResultado(r) {
     }
     html += `<p class="pista-cerrar">Podés cerrar esta pestaña y escanear el próximo QR cuando quieras</p>`;
     contenido.innerHTML = html;
-    reproducirSonidoError();
+    reproducirSonidoAviso();
     return;
   }
 
