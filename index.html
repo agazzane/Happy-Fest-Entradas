@@ -30,6 +30,8 @@
   <div id="login">
     <input id="pin" type="password" placeholder="PIN del personal" autocomplete="off">
     <button id="btnLogin">Ingresar</button>
+    <button id="btnDiag" class="sec">Diagnóstico</button>
+    <pre id="diag" style="white-space:pre-wrap;word-break:break-all;font-size:.8rem;margin-top:10px"></pre>
   </div>
 
   <div id="app" class="hide">
@@ -57,7 +59,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script>
-const VERSION = 'V1.4';
+const VERSION = 'V1.6';
 const API = 'https://script.google.com/macros/s/AKfycbzMpPl3zmXfQaGcZ1IcDG9wnPFv2LqhG8iqaqoqRgOzMpZf4h3qrcD73M2ElsGLJgKM/exec';
 document.getElementById('ver').textContent = VERSION;
 const $ = id => document.getElementById(id);
@@ -103,7 +105,7 @@ async function seguro(fn) {
 function verificar(code) {
   if (busy || !code) return;
   busy = true;
-  seguro(() => call({ a: 'check', c: code.trim() })).finally(() => setTimeout(() => busy = false, 2500));
+  seguro(() => call({ a: 'check', x: code.trim() })).finally(() => setTimeout(() => busy = false, 2500));
 }
 
 async function stats() {
@@ -159,6 +161,21 @@ $('btnLogin').onclick = async () => {
   $('login').classList.add('hide');
   $('app').classList.remove('hide');
   stats(); arrancar();
+};
+$('btnDiag').onclick = async () => {
+  PIN = $('pin').value.trim();
+  const out = $('diag');
+  out.textContent = TAG() + '\n';
+  for (const q of ['a=stats', 'a=buscar&x=B21CA5260267', 'a=check&x=ZZZ']) {
+    const t0 = Date.now();
+    try {
+      const r = await fetch(API + '?pin=' + encodeURIComponent(PIN) + '&' + q);
+      const t = await r.text();
+      out.textContent += q + ' → HTTP ' + r.status + ' · ' + (Date.now() - t0) + ' ms · ' + t.slice(0, 90) + '\n';
+    } catch (e) {
+      out.textContent += q + ' → FALLÓ · ' + (Date.now() - t0) + ' ms\n';
+    }
+  }
 };
 $('tabQr').onclick = () => cambiarModo('qr');
 $('tabDni').onclick = () => cambiarModo('dni');
