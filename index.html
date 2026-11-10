@@ -26,9 +26,11 @@
   .card input{text-align:center;font-size:1.3rem;letter-spacing:4px}
   #usr{font-size:1.15rem;text-align-last:center}
   .err{color:#ffb4b4;text-align:center;min-height:1.3em;margin-top:8px;font-size:.95rem}
-  .tabs{display:flex;gap:8px}.tabs button{margin:0;font-size:.95rem}
-  .tabs button.on{background:var(--gold);color:var(--navy)}
-  .tabs button:not(.on){background:rgba(255,255,255,.14);color:#fff}
+  .switch{position:relative;display:flex;background:rgba(255,255,255,.14);border-radius:999px;padding:4px}
+  .switch .thumb{position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);background:var(--gold);border-radius:999px;transition:transform .25s ease}
+  .switch[data-modo="dni"] .thumb{transform:translateX(100%)}
+  .switch button{position:relative;z-index:1;flex:1;margin:0;background:transparent;color:#fff;border-radius:999px;font-size:.95rem;padding:12px 6px;transition:color .25s}
+  .switch button.on{color:var(--navy)}
   #reader{width:100%;border-radius:14px;overflow:hidden;margin-top:10px;min-height:120px;background:#000}
   #res{margin-top:10px;padding:22px 14px;border-radius:16px;text-align:center;display:none}
   #res b{display:block;font-size:1.7rem;margin-bottom:6px}
@@ -44,7 +46,7 @@
 </head>
 <body>
 <main>
-  <header>
+  <header id="hdr">
     <div class="logo"><img src="img/logo.jpg" alt="Happy Fest" onerror="this.replaceWith(document.createTextNode('🎉'))"></div>
     <h1>Happy Fest</h1>
     <p>Control de puerta</p>
@@ -60,8 +62,9 @@
   </section>
 
   <div id="app" class="hide">
-    <div class="tabs">
-      <button id="tabQr" class="on">Entradas (QR)</button>
+    <div class="switch" id="sw" data-modo="qr">
+      <div class="thumb"></div>
+      <button id="tabQr" class="on">Escanear (QR)</button>
       <button id="tabDni">Venta en puerta (DNI)</button>
     </div>
     <div id="reader"></div>
@@ -86,7 +89,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script>
-const VERSION = 'V2.2';
+const VERSION = 'V2.3';
 const API = 'https://script.google.com/macros/s/AKfycbzMpPl3zmXfQaGcZ1IcDG9wnPFv2LqhG8iqaqoqRgOzMpZf4h3qrcD73M2ElsGLJgKM/exec';
 const $ = id => document.getElementById(id);
 $('ver').textContent = 'Happy Fest · ' + VERSION;
@@ -116,6 +119,7 @@ const MSG = {
 function show(r) {
   const el = $('res');
   el.style.display = 'block';
+  setTimeout(() => el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 50);
   if (!r.ok) { el.className = 'bad'; el.innerHTML = '<b>Error</b>' + (r.html || esc(r.error)); return; }
   const [cls, txt] = MSG[r.estado] || ['bad', 'RESPUESTA INESPERADA: ' + esc(JSON.stringify(r))];
   el.className = cls;
@@ -208,6 +212,7 @@ function cambiarModo(m) {
   pendiente = null; busy = false;
   $('tabQr').className = m === 'qr' ? 'on' : '';
   $('tabDni').className = m === 'dni' ? 'on' : '';
+  $('sw').dataset.modo = m;
   $('boxQr').classList.toggle('hide', m !== 'qr');
   $('boxDni').classList.toggle('hide', m !== 'dni');
   $('res').style.display = 'none';
@@ -229,6 +234,7 @@ async function login() {
     return;
   } finally { b.disabled = false; b.textContent = 'Ingresar'; }
   $('ver').textContent = 'Happy Fest · ' + VERSION + ' · ' + USR;
+  $('hdr').classList.add('hide');
   $('login').classList.add('hide');
   $('app').classList.remove('hide');
   stats(); arrancar();
