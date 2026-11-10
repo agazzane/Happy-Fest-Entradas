@@ -1,1068 +1,164 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#5B3DF5">
-<title>🎟️ Pasaporte Feria del Colegio</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>Happy Fest - Puerta</title>
 <style>
-  :root {
-    --color-primario: #5B3DF5;
-    --color-secundario: #16B978;
-    --color-acento: #FF6B35;
-    --color-amarillo: #FFD447;
-    --color-rosa: #FF5C8A;
-    --color-fondo: #F4F1FF;
-    --color-texto: #24243A;
-    --papel: #FFFDF7;
-  }
-
-  * { box-sizing: border-box; }
-
-  html, body { min-height: 100%; }
-
-  body {
-    font-family: 'Quicksand', -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
-    background: conic-gradient(var(--color-primario), var(--color-acento), var(--color-amarillo), var(--color-secundario), var(--color-rosa), var(--color-primario));
-    color: var(--color-texto);
-    margin: 0;
-    padding: 24px 14px;
-    min-height: 100vh;
-    min-height: 100dvh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  body::before,
-  body::after {
-    content: none;
-  }
-
-  .tarjeta {
-    position: relative;
-    background: var(--papel);
-    border-radius: 26px;
-    border: 2px solid #2E245E;
-    box-shadow:
-      0 0 0 6px rgba(255,255,255,.75),
-      0 18px 45px rgba(47,35,94,.18);
-    padding: 34px 22px 32px;
-    max-width: 460px;
-    width: 100%;
-    text-align: center;
-    overflow: hidden;
-  }
-
-  .tarjeta::before {
-    content: "SUCOVI";
-    position: absolute;
-    top: 17px;
-    right: -33px;
-    transform: rotate(38deg);
-    background: #F1F2F1;
-    color: #24243A;
-    font-family: 'Baloo 2', sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 1.2px;
-    padding: 4px 36px;
-    box-shadow: 0 3px 8px rgba(0,0,0,.16);
-    border-top: 3px solid #009246;
-    border-bottom: 3px solid #CE2B37;
-  }
-
-  .logo-envoltorio {
-    width: 116px;
-    height: 116px;
-    border-radius: 50%;
-    margin: 2px auto 16px;
-    padding: 4px;
-    background: conic-gradient(var(--color-primario), var(--color-acento), var(--color-amarillo), var(--color-secundario), var(--color-primario));
-    box-shadow: 0 5px 0 rgba(91,61,245,.16), 0 9px 22px rgba(36,36,58,.18);
-  }
-
-  .logo {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-    display: block;
-    background: white;
-    border: 5px solid white;
-  }
-
-  .barra-superior {
-    height: 7px;
-    width: 110px;
-    background: repeating-linear-gradient(
-      90deg,
-      var(--color-primario) 0 22px,
-      var(--color-amarillo) 22px 44px,
-      var(--color-acento) 44px 66px,
-      var(--color-secundario) 66px 88px
-    );
-    border-radius: 8px;
-    margin: 0 auto 20px;
-    box-shadow: 0 2px 0 rgba(46,36,94,.10);
-  }
-
-  h2 {
-    margin: 0 0 7px;
-    color: #33256D;
-    font-size: 29px;
-    line-height: 1.05;
-    font-family: 'Baloo 2', 'Quicksand', sans-serif;
-    font-weight: 700;
-  }
-
-  .subtitulo {
-    color: #6D6980;
-    font-size: 15px;
-    margin: 6px 0 14px;
-    line-height: 1.45;
-  }
-
-  .etiqueta-campo {
-    display: block;
-    text-align: left;
-    font-size: 12px;
-    font-weight: 700;
-    color: #5F5A72;
-    margin: 14px 2px 5px;
-    text-transform: uppercase;
-    letter-spacing: .4px;
-  }
-
-  .input-telefono {
-    font-size: 19px;
-    padding: 14px 16px;
-    width: 100%;
-    border: 2px solid #DDD8EC;
-    border-radius: 15px;
-    margin: 5px 0 3px;
-    outline: none;
-    display: block;
-    font-family: inherit;
-    background: white;
-    color: var(--color-texto);
-    box-shadow: inset 0 2px 5px rgba(45,36,82,.04);
-    transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
-  }
-
-  .input-telefono::placeholder { color: #756F89; }
-
-  .input-telefono:focus {
-    border-color: var(--color-primario);
-    box-shadow: 0 0 0 4px rgba(91,61,245,.12);
-    transform: translateY(-1px);
-  }
-
-  .boton-principal {
-    font-family: 'Baloo 2', 'Quicksand', sans-serif;
-    font-size: 21px;
-    font-weight: 700;
-    padding: 13px 32px;
-    border: 0;
-    border-radius: 15px;
-    background: linear-gradient(135deg, var(--color-primario), #7B5CFF);
-    color: #fff;
-    cursor: pointer;
-    width: 100%;
-    max-width: 280px;
-    margin-top: 16px;
-    box-shadow: 0 6px 0 #3D28AE, 0 10px 20px rgba(91,61,245,.20);
-    transition: transform .12s ease, box-shadow .12s ease;
-  }
-
-  .boton-principal:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 0 #3D28AE, 0 13px 23px rgba(91,61,245,.22);
-  }
-
-  .boton-principal:active {
-    transform: translateY(3px);
-    box-shadow: 0 3px 0 #3D28AE, 0 5px 12px rgba(91,61,245,.18);
-  }
-
-  .boton-principal:disabled {
-    opacity: .75;
-    cursor: default;
-    transform: none;
-  }
-
-  .spinner {
-    display: inline-block;
-    width: 15px;
-    height: 15px;
-    border: 2px solid rgba(255,255,255,.5);
-    border-top-color: #fff;
-    border-radius: 50%;
-    vertical-align: -2px;
-    margin-right: 6px;
-    animation: girar .7s linear infinite;
-  }
-
-  @keyframes girar { to { transform: rotate(360deg); } }
-
-  .boton-secundario {
-    font-size: 14px;
-    font-weight: 700;
-    padding: 10px 20px;
-    border: 2px solid #D7D1EA;
-    border-radius: 12px;
-    background: white;
-    color: var(--color-primario);
-    cursor: pointer;
-    margin-top: 10px;
-    box-shadow: 0 3px 0 #E6E1F1;
-  }
-
-  .aviso, .exito, .error-carga {
-    padding: 12px 14px;
-    border-radius: 14px;
-    font-size: 14px;
-    line-height: 1.45;
-    box-shadow: 0 3px 10px rgba(35,30,70,.06);
-  }
-
-  .aviso {
-    background: #FFF6E0;
-    color: #6B4A00;
-    border: 1px solid #F3D58A;
-  }
-
-  .exito {
-    background: #E9FBF2;
-    color: #087747;
-    border: 1px solid #A9E9CA;
-  }
-
-  .exito-principal {
-    font-size: 21px;
-    font-weight: 700;
-    padding: 17px 15px;
-    line-height: 1.3;
-  }
-
-  .animo {
-    font-size: 18px;
-    font-weight: 700;
-    color: #3B2B72;
-  }
-
-  .proxima-parada {
-    font-size: 17px;
-    font-weight: 600;
-    color: #3B2B72;
-    margin-bottom: 4px;
-  }
-
-  .error-carga {
-    background: #FFF0EF;
-    color: #9C2A1E;
-    border: 1px solid #F4B9B4;
-    text-align: left;
-    white-space: pre-wrap;
-  }
-
-  .contador {
-    display: inline-block;
-    font-size: 14px;
-    color: #4B4270;
-    background: #F0ECFF;
-    border: 1px solid #DDD5FF;
-    padding: 7px 12px;
-    border-radius: 999px;
-    margin: 3px 0 12px;
-  }
-
-  .ubicacion {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 7px;
-    color: #55516A;
-    font-size: 15px;
-    font-weight: 600;
-    background: #F5F3FA;
-    border: 1px solid #E5E0F0;
-    padding: 9px 10px;
-    border-radius: 11px;
-  }
-
-  .ubicacion svg {
-    flex-shrink: 0;
-  }
-
-  .pista-cerrar {
-    font-size: 13px;
-    color: #6D6980;
-    margin-top: 14px;
-  }
-
-  p { line-height: 1.4; }
-
-  /* ===== PASAPORTE ===== */
-  @keyframes stampIn {
-    0%   { transform: scale(3) rotate(-25deg); opacity: 0; }
-    55%  { transform: scale(.9) rotate(-6deg); opacity: 1; }
-    75%  { transform: scale(1.08) rotate(-11deg); }
-    100% { transform: scale(1) rotate(-9deg); opacity: 1; }
-  }
-
-  .pasaporte {
-    position: relative;
-    display: grid;
-    gap: 10px;
-    margin: 22px 0 20px;
-    padding: 12px 12px 14px;
-    background:
-      radial-gradient(circle at 20% 25%, rgba(91,61,245,.05) 0 2px, transparent 3px),
-      radial-gradient(circle at 80% 70%, rgba(255,107,53,.05) 0 2px, transparent 3px),
-      #FFFDF4;
-    border: 2px dashed #8C7FB7;
-    border-radius: 14px;
-    box-shadow: inset 0 0 0 5px rgba(255,255,255,.55);
-  }
-
-  .casillero {
-    aspect-ratio: 1 / 1;
-    border-radius: 13px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    position: relative;
-  }
-
-  .casillero.vacio {
-    border: 2px dashed #BDB4D3;
-    background: rgba(255,255,255,.72);
-    color: #6F678A;
-    font-size: 24px;
-    font-weight: 700;
-  }
-
-  .casillero.lleno {
-    border: 2px solid var(--color-secundario);
-    background: #EAF9F1;
-    box-shadow: 0 4px 0 rgba(22,185,120,.12);
-    transform: rotate(-4deg);
-  }
-
-  .casillero.lleno:nth-of-type(2n) { transform: rotate(4deg); }
-
-  .casillero.lleno img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
-
-  .casillero .check {
-    font-size: 30px;
-    font-weight: 800;
-    color: var(--color-secundario);
-  }
-
-  .casillero.nuevo {
-    animation: stampIn .55s cubic-bezier(.36,1.7,.4,1) both;
-  }
-
-  @media (max-width: 380px) {
-    .tarjeta { padding: 28px 16px 26px; }
-    .logo-envoltorio { width: 100px; height: 100px; }
-    h2 { font-size: 26px; }
-    .pasaporte { gap: 7px; padding-left: 8px; padding-right: 8px; }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .casillero.nuevo { animation: none; }
-    .spinner { animation: none; }
-    .loader-qr { animation: none; }
-  }
-
-  .version-tag {
-    position: absolute;
-    bottom: 8px;
-    right: 12px;
-    font-size: 11px;
-    font-weight: 700;
-    color: #8D87A3;
-    letter-spacing: .3px;
-    pointer-events: none;
-  }
-
-  #fireworksCanvas {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 999;
-  }
-
-  /* ===== LOADER INICIAL (QR girando) ===== */
-  .loader-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 18px;
-    background: linear-gradient(135deg, var(--color-primario), var(--color-rosa));
-    padding-top: env(safe-area-inset-top, 0px);
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-    transition: opacity .35s ease;
-  }
-
-  .loader-overlay.oculto {
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .loader-circulo {
-    width: 130px;
-    height: 130px;
-    border-radius: 50%;
-    background: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,.18);
-  }
-
-  .loader-qr {
-    width: 58px;
-    height: 58px;
-    animation: girarQR 1.6s linear infinite;
-  }
-
-  .loader-qr rect {
-    fill: var(--color-primario);
-  }
-
-  @keyframes girarQR {
-    0%   { transform: rotateY(0deg); }
-    100% { transform: rotateY(360deg); }
-  }
-
-  .loader-texto {
-    color: #fff;
-    font-family: 'Baloo 2', 'Quicksand', sans-serif;
-    font-weight: 700;
-    font-size: 16px;
-    margin: 0;
-  }
-
-  .solo-lector { position:absolute; width:1px; height:1px; margin:-1px; padding:0; border:0; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
-  .tarjeta.compacta .logo-envoltorio { width:60px; height:60px; margin:0 auto 12px; padding:3px; }
-  .tarjeta.compacta .logo { border-width:3px; }
-  .tarjeta.compacta .barra-superior { display:none; }
-  .pasaporte-cab { grid-column:1 / -1; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:6px 8px; text-align:left; }
-  .pasaporte-tit { font-family:'Baloo 2', sans-serif; font-size:15px; font-weight:700; color:#3B2B72; letter-spacing:.5px; }
-  .pasaporte-cont { font-size:13px; font-weight:700; color:#4B4270; background:#F0ECFF; border:1px solid #DDD5FF; padding:2px 10px; border-radius:999px; white-space:nowrap; }
-  .ayuda-campo { font-size:13px; color:#6D6980; text-align:left; margin:3px 2px 0; }
-  .error-campo { font-size:13px; font-weight:700; color:#A31E1E; text-align:left; margin:4px 2px 0; }
-  .error-campo:empty { display:none; }
-  .input-telefono.invalido { border-color:#D64545; }
-  .nota-privacidad { font-size:13px; color:#6D6980; margin:16px 0 0; }
-  .perfil-recordado { display:flex; align-items:center; gap:14px; text-align:left; background:#fff; border:2px solid #DDD5FF; border-radius:16px; padding:12px 14px; margin:6px 0 4px; }
-  .perfil-inicial { width:52px; height:52px; flex-shrink:0; border-radius:50%; background:#5B3DF5; color:#fff; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:26px; }
-  .perfil-datos { min-width:0; }
-  .perfil-nombre { font-family:'Baloo 2',sans-serif; font-weight:700; font-size:24px; line-height:1.1; color:#33256D; overflow-wrap:anywhere; }
-  .perfil-tel { font-size:14px; color:#6D6980; margin-top:2px; }
-  .perfil-tel b { color:#33256D; }
-  .exito small { display:block; font-size:15px; font-weight:600; margin-top:6px; }
-  .boton-principal:focus-visible, .boton-secundario:focus-visible { outline:3px solid #FFB020; outline-offset:3px; }
-
-  .paso-punto { display:inline-block; font-size:13px; font-weight:700; color:#4B4270; background:#F0ECFF; border:1px solid #DDD5FF; padding:3px 12px; border-radius:999px; margin:0 0 8px; }
-  .paso-puntos { display:flex; justify-content:center; align-items:center; gap:6px; margin:0 0 10px; }
-  .paso-puntos i { width:8px; height:8px; border-radius:50%; background:#DDD5FF; }
-  .paso-puntos i.previo { background:#A99BF5; }
-  .paso-puntos i.actual { background:#5B3DF5; transform:scale(1.4); }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,sans-serif;background:#111827;color:#fff}
+  main{max-width:480px;margin:0 auto;padding:14px}
+  h1{font-size:1.2rem;text-align:center;margin:6px 0 12px}
+  input,button{font-size:1.05rem;padding:12px;border-radius:10px;border:0;width:100%;margin-top:8px}
+  input{background:#fff;color:#111}
+  button{background:#2563eb;color:#fff;font-weight:600}
+  button.sec{background:#374151}
+  .tabs{display:flex;gap:8px}.tabs button{margin:0}
+  .tabs button.on{background:#2563eb}.tabs button:not(.on){background:#374151}
+  #reader{width:100%;border-radius:12px;overflow:hidden;margin-top:10px;min-height:120px;background:#000}
+  #res{margin-top:10px;padding:22px 14px;border-radius:14px;text-align:center;display:none}
+  #res b{display:block;font-size:1.7rem;margin-bottom:6px}
+  .ok{background:#16a34a}.warn{background:#d97706}.bad{background:#dc2626}
+  #stats{text-align:center;opacity:.8;margin-top:12px}
+  .hide{display:none}
 </style>
 </head>
 <body>
-  <canvas id="fireworksCanvas"></canvas>
-  <div id="anuncio" class="solo-lector" role="status" aria-live="polite"></div>
+<main>
+  <h1>Happy Fest - Control de puerta</h1>
 
-  <div class="loader-overlay" id="loaderOverlay">
-    <div class="loader-circulo">
-      <svg class="loader-qr" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <rect x="2" y="2" width="8" height="8" rx="1.3"></rect>
-        <rect x="14" y="2" width="8" height="8" rx="1.3"></rect>
-        <rect x="2" y="14" width="8" height="8" rx="1.3"></rect>
-        <rect x="14" y="14" width="3" height="3"></rect>
-        <rect x="19" y="14" width="3" height="3"></rect>
-        <rect x="14" y="19" width="3" height="3"></rect>
-        <rect x="19" y="19" width="3" height="3"></rect>
-      </svg>
-    </div>
-    <p class="loader-texto">Cargando tu pasaporte...</p>
+  <div id="login">
+    <input id="pin" type="password" placeholder="PIN del personal" autocomplete="off">
+    <button id="btnLogin">Ingresar</button>
   </div>
 
-  <div class="tarjeta" id="tarjeta">
-    <div class="logo-envoltorio" id="logoEnvoltorio">
-      <img class="logo" id="logo" src="img/logo.jpg" alt="Logo" onerror="this.parentElement.style.display='none'">
+  <div id="app" class="hide">
+    <div class="tabs">
+      <button id="tabQr" class="on">Entradas (QR)</button>
+      <button id="tabDni">Venta en puerta (DNI)</button>
     </div>
-    <div class="barra-superior" id="barraSuperior"></div>
-    <div id="contenido">
-      <p class="subtitulo">Cargando...</p>
-    </div>
-    <span class="version-tag" id="versionTag" style="display:none"></span>
-  </div>
+    <div id="reader"></div>
+    <div id="res"></div>
 
+    <div id="boxQr">
+      <input id="codigo" placeholder="Código manual (si el QR no lee)" autocapitalize="characters">
+      <button id="btnCodigo" class="sec">Verificar código</button>
+    </div>
+
+    <div id="boxDni" class="hide">
+      <input id="nombre" placeholder="Nombre">
+      <input id="apellido" placeholder="Apellido">
+      <input id="dni" inputmode="numeric" placeholder="DNI">
+      <button id="btnVenta">Registrar venta y dejar ingresar</button>
+    </div>
+    <div id="stats"></div>
+  </div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script>
-/* =========================================================================
- * CONFIGURACIÓN — pegá acá la URL de tu deploy de Apps Script (termina en /exec)
- * ========================================================================= */
-const API_URL = "https://script.google.com/macros/s/AKfycbxQchCtqbJ5gkovFnrD5MRLbNZx0A3aezmSI8Oqcu43IVoTjiYS-yt75M-FkTJX4vlV/exec";
+const API = 'PEGAR_AQUI_LA_URL_DE_APPS_SCRIPT/exec'; // termina en /exec
+const $ = id => document.getElementById(id);
+let PIN = '', busy = false, scanner = null, modo = 'qr';
 
-/* Número de versión de la página. Se muestra chiquito en la pantalla del
- * Punto 1 (abajo a la derecha de la tarjeta). Cambialo acá con cada
- * actualización que subas. */
-const APP_VERSION = "V2.3";
+async function call(p) {
+  const r = await fetch(API + '?' + new URLSearchParams({ ...p, pin: PIN }));
+  return r.json();
+}
 
-/* Imágenes de sello por punto. Poné los archivos en site/img/ con estos
- * nombres, o cambiá las rutas acá. Si un punto no tiene imagen, se muestra
- * un ✓ verde en su casillero. */
-const IMAGENES_SELLO = {
-  1: "img/sello-1.jpg",
-  2: "img/sello-2.jpg",
-  3: "img/sello-3.jpg",
-  4: "img/sello-4.jpg",
-  5: "img/sello-5.jpg"
+const MSG = {
+  VALIDA:       ['ok',   'ENTRADA VÁLIDA'],
+  YA_INGRESO:   ['warn', 'YA INGRESÓ'],
+  NO_EXISTE:    ['bad',  'NO EXISTE O NO ESTÁ PAGADA'],
+  VENTA_OK:     ['ok',   'VENTA REGISTRADA - PUEDE PASAR'],
+  DNI_REPETIDO: ['warn', 'ESTE DNI YA FUE REGISTRADO']
 };
 
-/* Tiempo mínimo (ms) que se muestra el QR girando antes de pasar al
- * formulario o al error, aunque la config cargue más rápido. */
-const LOADER_MINIMO_MS = 1000;
-
-const ICONO_UBICACION = `<svg xmlns="http://www.w3.org/2000/svg" width="39" height="39" viewBox="0 0 24 24"><path fill="#FF2D2D" d="M12 2C7.58 2 4 5.58 4 10c0 5.25 6.72 11.34 7.15 11.72a1.25 1.25 0 0 0 1.7 0C13.28 21.34 20 15.25 20 10c0-4.42-3.58-8-8-8z"></path><circle cx="12" cy="10" r="3.3" fill="#ffffff"></circle></svg>`;
-
-const ICONO_QR = `<svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" style="flex-shrink:0;vertical-align:-4px;margin-right:6px;"><rect x="2" y="2" width="8" height="8" rx="1.3" fill="none" stroke="#5B3DF5" stroke-width="2"></rect><rect x="5" y="5" width="2" height="2" fill="#5B3DF5"></rect><rect x="14" y="2" width="8" height="8" rx="1.3" fill="none" stroke="#5B3DF5" stroke-width="2"></rect><rect x="17" y="5" width="2" height="2" fill="#5B3DF5"></rect><rect x="2" y="14" width="8" height="8" rx="1.3" fill="none" stroke="#5B3DF5" stroke-width="2"></rect><rect x="5" y="17" width="2" height="2" fill="#5B3DF5"></rect><rect x="14" y="14" width="3" height="3" fill="#5B3DF5"></rect><rect x="19" y="14" width="3" height="3" fill="#5B3DF5"></rect><rect x="14" y="19" width="3" height="3" fill="#5B3DF5"></rect><rect x="19" y="19" width="3" height="3" fill="#5B3DF5"></rect></svg>`;
-
-const contenido = document.getElementById("contenido");
-const tarjeta = document.getElementById("tarjeta");
-const params = new URLSearchParams(window.location.search);
-const punto = parseInt(params.get("punto"), 10);
-
-let CONFIG = null;
-
-init();
-
-/* Oculta el QR girando con un fundido suave. La tarjeta de atrás ya tiene
- * el contenido final listo en ese momento (formulario o error). */
-function ocultarLoader() {
-  const loader = document.getElementById("loaderOverlay");
-  if (loader) loader.classList.add("oculto");
+function show(r) {
+  const el = $('res');
+  el.style.display = 'block';
+  if (!r.ok) { el.className = 'bad'; el.innerHTML = '<b>Error</b>' + r.error; return; }
+  const [cls, txt] = MSG[r.estado];
+  el.className = cls;
+  el.innerHTML = '<b>' + txt + '</b>' + (r.nombre || '') +
+    (r.familia ? '<br><small>Invita: ' + r.familia + '</small>' : '') +
+    (r.hora ? '<br><small>Hora de ingreso: ' + r.hora + '</small>' : '');
+  navigator.vibrate && navigator.vibrate(cls === 'ok' ? 100 : [200, 100, 200]);
+  stats();
 }
 
-/* Ejecuta `mostrarContenido` respetando el tiempo mínimo del loader: si la
- * config tardó menos de LOADER_MINIMO_MS, espera lo que falte antes de
- * ocultar el QR y revelar el resultado (formulario o error). */
-function finalizarCarga(inicioCarga, mostrarContenido) {
-  const transcurrido = Date.now() - inicioCarga;
-  const faltante = Math.max(0, LOADER_MINIMO_MS - transcurrido);
-  setTimeout(() => {
-    mostrarContenido();
-    ocultarLoader();
-  }, faltante);
+async function seguro(fn) {
+  try { show(await fn()); } catch (e) { show({ ok: false, error: 'Sin conexión. Usá el Plan B (planilla).' }); }
 }
 
-async function init() {
-  const inicioCarga = Date.now();
+function verificar(code) {
+  if (busy || !code) return;
+  busy = true;
+  seguro(() => call({ a: 'check', c: code.trim() })).finally(() => setTimeout(() => busy = false, 2500));
+}
 
-  if (!punto || punto < 1) {
-    finalizarCarga(inicioCarga, () => {
-      contenido.innerHTML = `<p>Este código QR no es válido. Avisá a un organizador.</p>`;
-    });
-    return;
-  }
-
+async function stats() {
   try {
-    const res = await fetch(`${API_URL}?action=config`);
-    const data = await res.json();
-    if (!data.ok) throw new Error(data.error || "No se pudo cargar la configuración.");
-    CONFIG = data;
-
-    if (punto > CONFIG.totalPuntos) {
-      finalizarCarga(inicioCarga, () => {
-        contenido.innerHTML = `<p>Este código QR no es válido. Avisá a un organizador.</p>`;
-      });
-      return;
-    }
-
-    finalizarCarga(inicioCarga, renderFormulario);
-  } catch (err) {
-    finalizarCarga(inicioCarga, () => {
-      contenido.innerHTML = `<p class="error-carga" role="alert">${escapeHtml(mensajeError(err))}</p>
-        <button type="button" class="boton-secundario" onclick="location.reload()">Reintentar</button>`;
-    });
-  }
+    const r = await call({ a: 'stats' });
+    if (r.ok) $('stats').textContent = 'Ingresaron ' + r.ingresaron + ' de ' + r.total + ' entradas';
+  } catch (e) {}
 }
 
-function nombrePunto(p) {
-  return (CONFIG.nombresPuntos && CONFIG.nombresPuntos[p]) || ("Punto " + p);
+/* DNI argentino (PDF417): NRO_TRAMITE@APELLIDO@NOMBRE@SEXO@DNI@EJEMPLAR@NACIMIENTO@EMISION... */
+function parseDni(txt) {
+  const p = txt.split('@').map(s => s.trim());
+  if (p.length < 5) return null;
+  let dni = p[4];
+  if (!/^\d{7,8}$/.test(dni)) dni = (p.slice(3).find(x => /^\d{7,8}$/.test(x))) || '';
+  return { apellido: p[1], nombre: p[2], dni };
 }
 
-function mensajeUbicacion(p) {
-  return (CONFIG.mensajesUbicacion && CONFIG.mensajesUbicacion[p]) || "";
-}
-
-const CLAVE_PERFIL = "pasaporte_perfil";
-function leerPerfil() { try { const p = JSON.parse(localStorage.getItem(CLAVE_PERFIL) || "null"); return p && p.telefono ? p : null; } catch (e) { return null; } }
-function guardarPerfil(p) { try { localStorage.setItem(CLAVE_PERFIL, JSON.stringify(p)); } catch (e) {} }
-function olvidarPerfil() { try { localStorage.removeItem(CLAVE_PERFIL); } catch (e) {} }
-
-function byId(id) { return document.getElementById(id); }
-function enmascarar(tel) { return "…" + String(tel).slice(-4); }
-
-/* Texto para lectores de pantalla (región aria-live #anuncio). */
-function anunciar(texto) {
-  const a = byId("anuncio");
-  if (!a) return;
-  a.textContent = "";
-  setTimeout(() => { a.textContent = texto; }, 60);
-}
-function anunciarResultado() {
-  const t = Array.from(contenido.querySelectorAll(".aviso,.exito,.proxima-parada,.ubicacion"))
-    .map(e => e.textContent.replace(/\s+/g, " ").trim()).join(" ");
-  if (t) anunciar(t);
-}
-
-/* Nunca mostramos errores técnicos crudos ("Failed to fetch", etc.). */
-function mensajeError(err) {
-  const m = String((err && err.message) || "");
-  if (!m || /failed to fetch|network|load failed|typeerror|json|unexpected token|abort/i.test(m)) {
-    return "No pudimos conectarnos. Revisá tu señal e intentá de nuevo.";
-  }
-  return m;
-}
-
-/* "Punto 2 de 5" + posición en el recorrido. */
-function indicadorPunto() {
-  const total = CONFIG.totalPuntos;
-  let dots = "";
-  for (let i = 1; i <= total; i++) dots += `<i class="${i < punto ? "previo" : i === punto ? "actual" : ""}"></i>`;
-  return `<p class="paso-punto">Punto ${punto} de ${total}</p><div class="paso-puntos" aria-hidden="true">${dots}</div>`;
-}
-
-function renderFormulario(forzarFormulario) {
-  tarjeta.classList.remove("compacta");
-  const esPrimerPunto = punto === 1;
-  const perfil = (!esPrimerPunto && forzarFormulario !== true) ? leerPerfil() : null;
-  const nota = `<p class="nota-privacidad">Usamos tu número solo para el sorteo.</p>`;
-
-  if (perfil) {
-    const nom = primerNombre(perfil.nombre);
-    const inicial = nom ? Array.from(nom)[0].toUpperCase() : "";
-    contenido.innerHTML = `
-      ${indicadorPunto()}
-      <h2>${escapeHtml(nombrePunto(punto))}</h2>
-      <p class="subtitulo">Sellá tu pasaporte con un toque.</p>
-      <div class="perfil-recordado">
-        ${inicial ? `<div class="perfil-inicial" aria-hidden="true">${escapeHtml(inicial)}</div>` : ""}
-        <div class="perfil-datos">
-          ${nom ? `<div class="perfil-nombre">${escapeHtml(nom)}</div>` : ""}
-          <div class="perfil-tel">Teléfono terminado en <b>${enmascarar(perfil.telefono)}</b></div>
-        </div>
-      </div>
-      <button type="button" id="btnAtajo" class="boton-principal">Sellar mi pasaporte</button>
-      <button type="button" id="btnNoSoy" class="boton-secundario">No soy yo / usar otro número</button>
-      ${nota}`;
-    byId("btnAtajo").addEventListener("click", () => enviarSello(perfil.telefono, "", "atajo"));
-    byId("btnNoSoy").addEventListener("click", () => { olvidarPerfil(); renderFormulario(true); });
-  } else {
-    contenido.innerHTML = `
-      ${indicadorPunto()}
-      <h2>${escapeHtml(nombrePunto(punto))}</h2>
-      <p class="subtitulo">${esPrimerPunto ? "Ingresá tus datos para empezar tu pasaporte." : "Ingresá tu número de teléfono para sellar tu pasaporte."}</p>
-      <form id="formSello" novalidate>
-        <label class="etiqueta-campo" for="campoTelefono">Número de teléfono</label>
-        <input id="campoTelefono" type="tel" name="telefono" placeholder="Ej: 1122334455" required
-               autocomplete="tel-national" inputmode="numeric" pattern="[0-9]*" maxlength="12" class="input-telefono"
-               aria-describedby="campoTelefonoAyuda campoTelefonoError"
-               oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,12)">
-        <p class="ayuda-campo" id="campoTelefonoAyuda">Con código de área, sin 0 ni 15.</p>
-        <p class="error-campo" id="campoTelefonoError" role="alert"></p>
-        ${esPrimerPunto ? `
-        <label class="etiqueta-campo" for="campoNombre">Nombre y apellido</label>
-        <input id="campoNombre" type="text" name="nombre" placeholder="Ej: Juan Pérez" required
-               autocomplete="name" maxlength="40" class="input-telefono"
-               aria-describedby="campoNombreError"
-               oninput="filtrarNombre(this)">
-        <p class="error-campo" id="campoNombreError" role="alert"></p>` : ""}
-        <button type="submit" id="btnSellar" class="boton-principal">Sellar mi pasaporte</button>
-      </form>
-      ${nota}`;
-    byId("formSello").addEventListener("submit", onSubmitFormulario);
-    ["campoTelefono", "campoNombre"].forEach(id => {
-      const el = byId(id);
-      if (el) el.addEventListener("input", () => mostrarErrorCampo(id, ""));
-    });
-  }
-
-  const versionTag = byId("versionTag");
-  if (versionTag) {
-    versionTag.textContent = APP_VERSION;
-    versionTag.style.display = "block";
-  }
-}
-
-/* Permite letras (con acentos), espacios, apóstrofo y guion: D'Angelo, María-José. */
-function filtrarNombre(el) {
-  const inicioCursor = el.selectionStart;
-  const valorOriginal = el.value;
-  const valorLimpio = valorOriginal.replace(/[^A-Za-zÀ-ÖØ-öø-ÿ\s'’-]/g, "").slice(0, 40);
-  if (valorLimpio === valorOriginal) return;
-  const diferencia = valorOriginal.length - valorLimpio.length;
-  el.value = valorLimpio;
-  const nuevaPos = Math.max(0, (inicioCursor || 0) - diferencia);
-  el.setSelectionRange(nuevaPos, nuevaPos);
-}
-
-function mostrarErrorCampo(id, msg) {
-  const el = byId(id), err = byId(id + "Error");
-  if (!el || !err) return;
-  err.textContent = msg;
-  el.setAttribute("aria-invalid", msg ? "true" : "false");
-  el.classList.toggle("invalido", !!msg);
-}
-
-function validarFormulario() {
-  let primero = null;
-  const tel = byId("campoTelefono");
-  const errTel = tel.value.trim().length < 10 ? "Ingresá tu número completo: código de área + número, 10 dígitos." : "";
-  mostrarErrorCampo("campoTelefono", errTel);
-  if (errTel) primero = tel;
-
-  const nom = byId("campoNombre");
-  if (nom) {
-    const letras = nom.value.replace(/[^A-Za-zÀ-ÖØ-öø-ÿ]/g, "").length;
-    const errNom = letras < 2 ? "Ingresá tu nombre y apellido." : "";
-    mostrarErrorCampo("campoNombre", errNom);
-    if (errNom && !primero) primero = nom;
-  }
-  if (primero) primero.focus();
-  return !primero;
-}
-
-function onSubmitFormulario(ev) {
-  ev.preventDefault();
-  if (!validarFormulario()) return;
-  const telefono = byId("campoTelefono").value.trim();
-  const nombreEl = byId("campoNombre");
-  enviarSello(telefono, nombreEl ? nombreEl.value.trim() : "", "form");
-}
-
-async function enviarSello(telefono, nombre, origen) {
-  const btn = byId(origen === "form" ? "btnSellar" : "btnAtajo");
-  btn.disabled = true;
-  btn.innerHTML = `<span class="spinner"></span> Procesando...`;
-  /* Apps Script puede tardar varios segundos: avisamos que sigue trabajando. */
-  const avisoLento = setTimeout(() => {
-    btn.innerHTML = `<span class="spinner"></span> Sigue conectando...`;
-    anunciar("Sigue conectando, un momento.");
-  }, 4000);
-
-  try {
-    const qs = new URLSearchParams({ action: "sellar", punto: String(punto), telefono });
-    if (nombre) qs.set("nombre", nombre);
-
-    const res = await fetch(`${API_URL}?${qs.toString()}`);
-    const data = await res.json();
-    if (data.error) throw new Error(data.error);
-
-    const previo = leerPerfil();
-    guardarPerfil({
-      telefono,
-      nombre: nombre || data.nombre || (previo && previo.telefono === telefono ? previo.nombre : "")
-    });
-    renderResultado(data);
-  } catch (err) {
-    /* Volvemos al formulario conservando lo que la persona había escrito. */
-    renderFormulario(origen === "form");
-    if (origen === "form") {
-      const t = byId("campoTelefono"); if (t) t.value = telefono;
-      const n = byId("campoNombre");   if (n) n.value = nombre;
-    }
-    contenido.insertAdjacentHTML("afterbegin", `<p class="error-carga" role="alert">${escapeHtml(mensajeError(err))}</p>`);
-  } finally {
-    clearTimeout(avisoLento);
-  }
-}
-
-function primerNombre(nombreCompleto) {
-  if (!nombreCompleto) return "";
-  return String(nombreCompleto).trim().split(/\s+/)[0];
-}
-
-function elegirAlAzar(opciones) {
-  return opciones[Math.floor(Math.random() * opciones.length)];
-}
-
-function renderPasaporte(sellos, puntoNuevo) {
-  const hechos = sellos.filter(Boolean).length;
-  let html = `<div class="pasaporte" role="group" aria-label="Tu pasaporte: ${hechos} de ${sellos.length} sellos" style="grid-template-columns:repeat(${CONFIG.totalPuntos},1fr);"><div class="pasaporte-cab" aria-hidden="true"><span class="pasaporte-tit">PASAPORTE DE LA FERIA</span><span class="pasaporte-cont">${hechos} de ${sellos.length} sellos</span></div>`;
-  sellos.forEach((lleno, i) => {
-    const p = i + 1;
-    if (lleno) {
-      const esNuevo = p === puntoNuevo;
-      const src = IMAGENES_SELLO[p];
-      const contenidoCasillero = src
-        ? `<img src="${src}" alt="" onerror="this.parentElement.innerHTML='<span class=&quot;check&quot;>✓</span>'">`
-        : `<span class="check">✓</span>`;
-      html += `<div class="casillero lleno${esNuevo ? " nuevo" : ""}" role="img" aria-label="Sello ${p}: completado">${contenidoCasillero}</div>`;
-    } else {
-      html += `<div class="casillero vacio" role="img" aria-label="Sello ${p}: pendiente"><span aria-hidden="true">${p}</span></div>`;
-    }
+async function arrancar() {
+  if (scanner) { try { await scanner.stop(); } catch (e) {} }
+  const F = Html5QrcodeSupportedFormats;
+  scanner = new Html5Qrcode('reader', {
+    formatsToSupport: [modo === 'qr' ? F.QR_CODE : F.PDF_417],
+    experimentalFeatures: { useBarCodeDetectorIfSupported: true },
+    verbose: false
   });
-  return html + `</div>`;
+  const box = modo === 'qr' ? { width: 250, height: 250 } : { width: 320, height: 130 };
+  scanner.start({ facingMode: 'environment' }, { fps: 10, qrbox: box }, txt => {
+    if (modo === 'qr') return verificar(txt);
+    const d = parseDni(txt);
+    if (!d) return;
+    $('apellido').value = d.apellido; $('nombre').value = d.nombre; $('dni').value = d.dni;
+    navigator.vibrate && navigator.vibrate(80);
+  }).catch(e => alert('No se pudo abrir la cámara: ' + e));
 }
 
-// Vibración corta del celular para acompañar cada sonido (si el navegador
-// lo permite; en iOS Safari no hay soporte y simplemente no hace nada).
-function vibrar(patron) {
+function cambiarModo(m) {
+  modo = m;
+  $('tabQr').className = m === 'qr' ? 'on' : '';
+  $('tabDni').className = m === 'dni' ? 'on' : '';
+  $('boxQr').classList.toggle('hide', m !== 'qr');
+  $('boxDni').classList.toggle('hide', m !== 'dni');
+  $('res').style.display = 'none';
+  arrancar();
+}
+
+$('btnLogin').onclick = async () => {
+  PIN = $('pin').value.trim();
   try {
-    if (navigator.vibrate) navigator.vibrate(patron);
-  } catch (e) { /* no pasa nada si no hay soporte */ }
-}
-
-function reproducirSonidoAcierto() {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const ahora = ctx.currentTime;
-    function nota(frecuencia, inicio, duracion, volumen) {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = "triangle";
-      osc.frequency.setValueAtTime(frecuencia, ahora + inicio);
-      gain.gain.setValueAtTime(0, ahora + inicio);
-      gain.gain.linearRampToValueAtTime(volumen, ahora + inicio + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.001, ahora + inicio + duracion);
-      osc.connect(gain).connect(ctx.destination);
-      osc.start(ahora + inicio);
-      osc.stop(ahora + inicio + duracion + 0.05);
-    }
-    nota(523.25, 0.00, 0.12, 0.18);
-    nota(659.25, 0.09, 0.12, 0.18);
-    nota(783.99, 0.18, 0.20, 0.20);
-  } catch (e) { /* si el navegador bloquea el audio automático, no pasa nada */ }
-  vibrar([25]);
-}
-
-// Sonido de error tipo "botón equivocado": dos tonos cortos y graves que
-// bajan de altura, como un buzzer de interfaz.
-/* Aviso amistoso (no es un error): una sola nota suave y vibración corta. */
-function reproducirSonidoAviso() {
-  try {
-    const ctx = _getSuccessAudioCtx();
-    if (ctx) _successTone(ctx, 660, ctx.currentTime, 0.22, { type: "sine", gain: 0.1 });
-  } catch (e) { /* sin audio, no pasa nada */ }
-  vibrar([25]);
-}
-
-function reproducirSonidoError() {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const ahora = ctx.currentTime;
-    function tono(frecuencia, inicio, duracion, volumen) {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = "square";
-      osc.frequency.setValueAtTime(frecuencia, ahora + inicio);
-      gain.gain.setValueAtTime(0, ahora + inicio);
-      gain.gain.linearRampToValueAtTime(volumen, ahora + inicio + 0.01);
-      gain.gain.exponentialRampToValueAtTime(0.001, ahora + inicio + duracion);
-      osc.connect(gain).connect(ctx.destination);
-      osc.start(ahora + inicio);
-      osc.stop(ahora + inicio + duracion + 0.03);
-    }
-    tono(330, 0.00, 0.13, 0.13);
-    tono(208, 0.12, 0.22, 0.15);
-  } catch (e) { /* si el navegador bloquea el audio automático, no pasa nada */ }
-  vibrar([60, 40, 60]);
-}
-
-// ── FUEGOS ARTIFICIALES (tomado del mapa de stands SUCOVI) ──────────────────
-// 5 explosiones con estela, repartidas por la pantalla, dibujadas sobre un
-// <canvas> a pantalla completa. Se apaga sola a los ~2.6s.
-const FIREWORKS_COLORS = ["#1B3B6F", "#2E7D32", "#E8702A", "#F4C542", "#D62839", "#5e5ce6"];
-let _fireworksRaf = null;
-let _fireworksTimeouts = [];
-
-function fireworksEffect() {
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  const canvas = document.getElementById("fireworksCanvas");
-  if (!canvas) return;
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  const c = canvas.getContext("2d");
-  c.clearRect(0, 0, canvas.width, canvas.height);
-
-  const spots = [[.2, .3], [.8, .25], [.5, .18], [.35, .55], [.65, .5]];
-  let particles = [];
-  spots.forEach((s, i) => {
-    _fireworksTimeouts.push(setTimeout(() => {
-      const x = canvas.width * s[0], y = canvas.height * s[1];
-      for (let k = 0; k < 38; k++) {
-        const a = Math.random() * Math.PI * 2, sp = 2.5 + Math.random() * 5.5;
-        particles.push({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, life: 1, color: FIREWORKS_COLORS[Math.floor(Math.random() * FIREWORKS_COLORS.length)] });
-      }
-    }, i * 280));
-  });
-
-  const t0 = performance.now();
-  function frame(t) {
-    c.clearRect(0, 0, canvas.width, canvas.height);
-    particles.forEach(p => {
-      p.vy += 0.045; p.x += p.vx; p.y += p.vy; p.life -= 0.012;
-      c.globalAlpha = Math.max(p.life, 0);
-      c.fillStyle = p.color;
-      c.beginPath(); c.arc(p.x, p.y, 2.8, 0, Math.PI * 2); c.fill();
-    });
-    c.globalAlpha = 1;
-    particles = particles.filter(p => p.life > 0);
-    if (t - t0 < 2600) {
-      _fireworksRaf = requestAnimationFrame(frame);
-    } else {
-      c.clearRect(0, 0, canvas.width, canvas.height);
-    }
-  }
-  _fireworksRaf = requestAnimationFrame(frame);
-}
-
-function stopFireworksEffect() {
-  if (_fireworksRaf) cancelAnimationFrame(_fireworksRaf);
-  _fireworksRaf = null;
-  _fireworksTimeouts.forEach(clearTimeout);
-  _fireworksTimeouts = [];
-  const canvas = document.getElementById("fireworksCanvas");
-  if (canvas) canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
-}
-
-// ── SONIDO DE FUEGOS ARTIFICIALES (mismo helper que el mapa de stands) ──────
-let _successAudioCtx = null;
-function _getSuccessAudioCtx() {
-  if (!_successAudioCtx) {
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) return null;
-    _successAudioCtx = new AC();
-  }
-  if (_successAudioCtx.state === "suspended") _successAudioCtx.resume();
-  return _successAudioCtx;
-}
-function _successTone(ctx, freq, start, dur, { type = "sine", gain = 0.2 } = {}) {
-  const osc = ctx.createOscillator();
-  const g   = ctx.createGain();
-  osc.type = type;
-  osc.frequency.setValueAtTime(freq, start);
-  g.gain.setValueAtTime(0, start);
-  g.gain.linearRampToValueAtTime(gain, start + 0.01);
-  g.gain.exponentialRampToValueAtTime(0.001, start + dur);
-  osc.connect(g).connect(ctx.destination);
-  osc.start(start);
-  osc.stop(start + dur + 0.02);
-}
-function playFireworksSound() {
-  const ctx = _getSuccessAudioCtx();
-  if (!ctx) return;
-  const t = ctx.currentTime;
-  const freqs = [1800, 2400, 3000, 2100, 2700];
-  freqs.forEach((f, i) => _successTone(ctx, f, t + i * 0.28, 0.35, { type: "square", gain: 0.06 }));
-}
-
-/* Todas las pantallas de resultado usan el mismo encabezado compacto. */
-function ocultarEncabezado() {
-  tarjeta.classList.add("compacta");
-}
-
-function renderResultado(r) {
-  ocultarEncabezado();
-  _renderResultado(r);
-  anunciarResultado();
-}
-
-function _renderResultado(r) {
-  const versionTagEl = document.getElementById("versionTag");
-  if (versionTagEl) versionTagEl.style.display = "block";
-  const nombreActual = nombrePunto(punto);
-  const nombreCorto = primerNombre(r.nombre);
-  const saludo = nombreCorto ? (nombreCorto + ", ") : "";
-  let html = "";
-
-  if (!r.ok) {
-    html += renderPasaporte(r.sellos, null);
-    const nombrePendiente = nombrePunto(r.puntoPendiente);
-    const ubic = mensajeUbicacion(r.puntoPendiente);
-    const lineaUbicacion = ubic ? `<p class="ubicacion">${ICONO_UBICACION}${ubic}</p>` : "";
-
-    if (r.motivo === "debe_empezar_por_1") {
-      html += `<p class="aviso">¡Epa! Todavía no arrancaste tu pasaporte. Empezá por el <b>${nombrePunto(1)}</b> para sumar tu primer sello</p>${lineaUbicacion}`;
-    } else if (r.motivo === "ya_tenia_este_punto") {
-      html += `<p class="aviso" style="font-size:17px;">${saludo}¡Ese ya lo tenés guardado!<br>Seguí para el <b>${nombrePendiente}</b></p>${lineaUbicacion}`;
-    } else if (r.motivo === "orden_incorrecto") {
-      html += `<p class="aviso">${saludo}¡Epa, en orden! Primero el <b>${nombrePendiente}</b> y después seguimos</p>${lineaUbicacion}`;
-    }
-    html += `<p class="pista-cerrar">Podés cerrar esta pestaña y escanear el próximo QR cuando quieras</p>`;
-    contenido.innerHTML = html;
-    reproducirSonidoAviso();
-    return;
-  }
-
-  const mensajeFinal = (CONFIG.mensajeFinal && CONFIG.mensajeFinal.trim())
-    ? CONFIG.mensajeFinal.trim()
-    : "Ya estás anotado/a en el sorteo.";
-
-  if (r.yaEstabaCompletoAntes) {
-    html += renderPasaporte(r.sellos, null);
-    html += `<p class="exito">🎉 ${saludo}ya habías completado todo el recorrido. ${mensajeFinal}</p>`;
-    html += `<p class="pista-cerrar">Ya podés cerrar esta pestaña</p>`;
-    contenido.innerHTML = html;
-    return;
-  }
-
-  html += renderPasaporte(r.sellos, r.puntoRecienGuardado);
-  const lineaSello = `${saludo}¡sello de <b>${nombreActual}</b> registrado!`;
-  if (!r.completo) html += `<p class="exito exito-principal">${lineaSello}</p>`;
-
-  if (r.completo) {
-    html += `<div class="exito exito-principal">🎉 ¡Completaste el recorrido!<small>${lineaSello}</small><small>${mensajeFinal}</small></div>`;
-    html += `<p class="pista-cerrar">Ya podés cerrar esta pestaña</p>`;
-  } else {
-    const proximoPendiente = r.puntoRecienGuardado ? r.puntoRecienGuardado + 1 : null;
-    if (proximoPendiente && proximoPendiente <= CONFIG.totalPuntos) {
-      const ubic = mensajeUbicacion(proximoPendiente);
-      if (ubic) {
-        const nombreProximo = nombrePunto(proximoPendiente);
-        html += `<p class="proxima-parada">Tu próxima parada es el <b style="font-size:19px;">${nombreProximo}</b>. ¡Vamos por ese QR! ${ICONO_QR}</p>`;
-        html += `<p class="ubicacion">${ICONO_UBICACION}${ubic}</p>`;
-      }
-    }
-    html += `<p class="pista-cerrar">Podés cerrar esta pestaña y escanear el próximo QR cuando quieras</p>`;
-  }
-
-  contenido.innerHTML = html;
-  ocultarEncabezado();
-
-  if (r.completo) {
-    fireworksEffect();
-    playFireworksSound();
-    vibrar([100, 150, 60, 150, 100, 150, 60, 150, 100]);
-  } else {
-    reproducirSonidoAcierto();
-  }
-}
-
-function escapeHtml(str) {
-  const div = document.createElement("div");
-  div.textContent = str;
-  return div.innerHTML;
-}
+    const r = await call({ a: 'stats' });
+    if (!r.ok) return alert('PIN incorrecto');
+  } catch (e) { return alert('No hay conexión con el servidor'); }
+  $('login').classList.add('hide');
+  $('app').classList.remove('hide');
+  stats(); arrancar();
+};
+$('tabQr').onclick = () => cambiarModo('qr');
+$('tabDni').onclick = () => cambiarModo('dni');
+$('btnCodigo').onclick = () => { verificar($('codigo').value); $('codigo').value = ''; };
+$('btnVenta').onclick = () => {
+  if (!$('nombre').value.trim() && !$('apellido').value.trim()) return alert('Falta el nombre');
+  seguro(() => call({ a: 'venta', nombre: $('nombre').value, apellido: $('apellido').value, dni: $('dni').value }))
+    .then(() => { $('nombre').value = $('apellido').value = $('dni').value = ''; });
+};
 </script>
 </body>
 </html>
