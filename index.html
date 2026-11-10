@@ -12,10 +12,11 @@
   main{max-width:480px;margin:0 auto;padding:18px 14px 28px}
   header{text-align:center;margin:10px 0 18px}
   .logo{font-size:2.6rem;line-height:1}
+  .logo img{max-width:62%;max-height:150px;object-fit:contain;border-radius:14px;display:inline-block}
   header h1{font-size:1.7rem;margin:6px 0 0;letter-spacing:.5px;color:var(--gold)}
   header p{margin:2px 0 0;opacity:.75;font-size:.95rem;letter-spacing:2px;text-transform:uppercase}
-  input,button{font-size:1.05rem;padding:13px;border-radius:12px;border:0;width:100%;margin-top:8px;font-family:inherit}
-  input{background:#fff;color:#111}
+  input,select,button{font-size:1.05rem;padding:13px;border-radius:12px;border:0;width:100%;margin-top:8px;font-family:inherit}
+  input,select{background:#fff;color:#111}
   button{background:var(--gold);color:var(--navy);font-weight:700}
   button:disabled{opacity:.6}
   button.sec{background:rgba(255,255,255,.14);color:#fff}
@@ -23,7 +24,7 @@
         box-shadow:0 10px 30px rgba(0,0,0,.25)}
   .card label{display:block;font-size:.85rem;opacity:.8;margin-bottom:2px}
   .card input{text-align:center;font-size:1.3rem;letter-spacing:4px}
-  #usr{letter-spacing:normal;font-size:1.15rem}
+  #usr{font-size:1.15rem;text-align-last:center}
   .err{color:#ffb4b4;text-align:center;min-height:1.3em;margin-top:8px;font-size:.95rem}
   .tabs{display:flex;gap:8px}.tabs button{margin:0;font-size:.95rem}
   .tabs button.on{background:var(--gold);color:var(--navy)}
@@ -44,14 +45,14 @@
 <body>
 <main>
   <header>
-    <div class="logo">🎉</div>
+    <div class="logo"><img src="img/logo.jpg" alt="Happy Fest" onerror="this.replaceWith(document.createTextNode('🎉'))"></div>
     <h1>Happy Fest</h1>
     <p>Control de puerta</p>
   </header>
 
   <section id="login" class="card">
     <label for="usr">Usuario</label>
-    <input id="usr" type="text" placeholder="Usuario" autocomplete="username" autocapitalize="none">
+    <select id="usr"><option value="">Cargando usuarios…</option></select>
     <label for="pin" style="margin-top:12px">Contraseña</label>
     <input id="pin" type="password" placeholder="••••" autocomplete="current-password">
     <div id="loginErr" class="err"></div>
@@ -85,7 +86,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script>
-const VERSION = 'V2.1';
+const VERSION = 'V2.2';
 const API = 'https://script.google.com/macros/s/AKfycbzMpPl3zmXfQaGcZ1IcDG9wnPFv2LqhG8iqaqoqRgOzMpZf4h3qrcD73M2ElsGLJgKM/exec';
 const $ = id => document.getElementById(id);
 $('ver').textContent = 'Happy Fest · ' + VERSION;
@@ -218,7 +219,7 @@ async function login() {
   PIN = $('pin').value.trim();
   const err = $('loginErr'), b = $('btnLogin');
   err.textContent = '';
-  if (!USR || !PIN) { err.textContent = 'Ingresá usuario y contraseña'; return; }
+  if (!USR || !PIN) { err.textContent = 'Elegí tu usuario y escribí la contraseña'; return; }
   b.disabled = true; b.textContent = 'Verificando…';
   try {
     const r = await call({ a: 'stats' });
@@ -232,6 +233,24 @@ async function login() {
   $('app').classList.remove('hide');
   stats(); arrancar();
 }
+
+let usuariosOk = false;
+async function cargarUsuarios() {
+  const sel = $('usr'), err = $('loginErr');
+  try {
+    const r = await call({ a: 'usuarios' });
+    if (!r.ok) throw new Error(r.error);
+    const lista = (r.usuarios || []).slice().sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+    sel.innerHTML = '<option value="">Elegí tu usuario</option>' + lista.map(u => '<option>' + esc(u) + '</option>').join('');
+    usuariosOk = true;
+    err.textContent = lista.length ? '' : 'No hay usuarios cargados en la hoja Users';
+  } catch (e) {
+    sel.innerHTML = '<option value="">No se pudo cargar · tocá para reintentar</option>';
+    err.textContent = 'No se pudo cargar la lista de usuarios (' + (e && e.message ? e.message : e) + ')';
+  }
+}
+$('usr').addEventListener('focus', () => { if (!usuariosOk) cargarUsuarios(); });
+cargarUsuarios();
 
 $('btnLogin').onclick = login;
 $('usr').addEventListener('keydown', e => { if (e.key === 'Enter') $('pin').focus(); });
