@@ -49,6 +49,9 @@
   #res .nom{font-size:2.2rem;font-weight:700;line-height:1.15;margin:4px 0 6px;word-break:break-word}
   #res small{font-size:1rem}
   .ok{background:#16a34a}.warn{background:#d97706}.bad{background:#dc2626}
+  .info{background:#1E2A5A;border:2px solid var(--gold)}
+  #res .dato{font-size:1.3rem;margin-top:2px}
+  #res select{margin-top:16px;font-size:1.15rem;text-align-last:center}
   .acts{display:flex;gap:8px;margin-top:20px}.acts button{margin:0}
   #btnEntrar{flex:2;background:#fff;color:#15803d;font-size:1.25rem;padding:16px}
   #btnCancel{flex:1;background:rgba(0,0,0,.25);color:#fff}
@@ -109,7 +112,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script>
-const VERSION = 'V2.7';
+const VERSION = 'V2.8';
 const API = 'https://script.google.com/macros/s/AKfycbzMpPl3zmXfQaGcZ1IcDG9wnPFv2LqhG8iqaqoqRgOzMpZf4h3qrcD73M2ElsGLJgKM/exec';
 const $ = id => document.getElementById(id);
 $('ver').textContent = 'Happy Fest · ' + VERSION;
@@ -199,10 +202,39 @@ function show(r) {
 // Cierra el cartel y vuelve a habilitar el escaneo.
 function cerrar() {
   pendiente = null;
+  bloqDni.hasta = Date.now() + 4000;
   $('ov').classList.add('hide');
   $('res').innerHTML = '';
   // pequeña pausa para que no relea el mismo código que sigue frente a la cámara
   setTimeout(() => busy = false, 800);
+}
+
+// ---- Venta en puerta con DNI escaneado: pantalla de confirmación ----
+const MEDIOS = ['Efectivo', 'MP Sucovi'];
+let bloqDni = { dni: '', hasta: 0 }; // evita releer enseguida el mismo DNI que sigue frente a la cámara
+function confirmarVenta(d) {
+  busy = true;
+  bloqDni.dni = d.dni;
+  const nombreCompleto = (d.nombre + ' ' + d.apellido).trim();
+  const el = $('res');
+  $('ov').classList.remove('hide');
+  el.className = 'info';
+  el.innerHTML = '<b>VENTA EN PUERTA</b><div class="nom">' + esc(nombreCompleto) + '</div>' +
+    '<div class="dato">DNI: ' + (d.dni ? esc(d.dni) : '—') + '</div>' +
+    '<select id="medioV"><option value="">Medio de pago (obligatorio)</option>' +
+    MEDIOS.map(m => '<option value="' + esc(m) + '">' + esc(m) + '</option>').join('') + '</select>' +
+    '<div id="vErr" class="err"></div>' +
+    '<div class="acts"><button id="btnEntrar">Aceptar</button><button id="btnCancel">Cancelar</button></div>';
+  $('medioV').addEventListener('change', () => { $('vErr').textContent = ''; });
+  $('btnCancel').onclick = cerrar;
+  $('btnEntrar').onclick = async () => {
+    const medio = $('medioV').value;
+    if (!medio) { $('vErr').textContent = 'Elegí el medio de pago'; return; }
+    audio();
+    $('btnEntrar').disabled = true; $('btnEntrar').textContent = 'Registrando…';
+    $('btnCancel').disabled = true;
+    await seguro(() => call({ a: 'venta', nombre: d.nombre, apellido: d.apellido, dni: d.dni, medio }));
+  };
 }
 
 async function seguro(fn) {
@@ -258,9 +290,10 @@ async function arrancar() {
     if (busy) return; // hay un cartel abierto: no se escanea nada hasta cerrarlo
     if (modo === 'qr') return verificar(txt);
     const d = parseDni(txt);
-    if (!d) return;
-    $('apellido').value = d.apellido; $('nombre').value = d.nombre; $('dni').value = d.dni;
+    if (!d || !d.nombre) return;
+    if (d.dni && d.dni === bloqDni.dni && Date.now() < bloqDni.hasta) return;
     navigator.vibrate && navigator.vibrate(80);
+    confirmarVenta(d);
   }).catch(e => alert('No se pudo abrir la cámara: ' + e));
 }
 
@@ -268,6 +301,7 @@ function cambiarModo(m) {
   modo = m;
   pendiente = null; busy = false;
   $('ov').classList.add('hide');
+  $('nombre').value = $('apellido').value = $('dni').value = ''; $('medio').value = '';
   $('tabQr').className = m === 'qr' ? 'on' : '';
   $('tabDni').className = m === 'dni' ? 'on' : '';
   $('sw').dataset.modo = m;
