@@ -57,7 +57,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script>
-const VERSION = 'V1.0';
+const VERSION = 'V1.1';
 const API = 'https://script.google.com/macros/s/AKfycbyVANuzQ4goyXr99yi3cXZokIM5gJprM9MN2b-K8VGRE5HaRtoU-XKVefXktkIi1tvShw/exec';
 document.getElementById('ver').textContent = VERSION;
 const $ = id => document.getElementById(id);
@@ -102,7 +102,7 @@ function verificar(code) {
 async function stats() {
   try {
     const r = await call({ a: 'stats' });
-    if (r.ok) $('stats').textContent = 'Ingresaron ' + r.ingresaron + ' de ' + r.total + ' entradas';
+    if (r.ok) $('stats').textContent = 'Ingresaron ' + r.ingresaron + ' de ' + r.total + ' entradas · Servidor ' + (r.version || 'V1.0');
   } catch (e) {}
 }
 
