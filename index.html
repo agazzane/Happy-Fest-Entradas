@@ -23,6 +23,7 @@
         box-shadow:0 10px 30px rgba(0,0,0,.25)}
   .card label{display:block;font-size:.85rem;opacity:.8;margin-bottom:2px}
   .card input{text-align:center;font-size:1.3rem;letter-spacing:4px}
+  #usr{letter-spacing:normal;font-size:1.15rem}
   .err{color:#ffb4b4;text-align:center;min-height:1.3em;margin-top:8px;font-size:.95rem}
   .tabs{display:flex;gap:8px}.tabs button{margin:0;font-size:.95rem}
   .tabs button.on{background:var(--gold);color:var(--navy)}
@@ -49,8 +50,10 @@
   </header>
 
   <section id="login" class="card">
-    <label for="pin">PIN del personal</label>
-    <input id="pin" type="password" placeholder="••••" autocomplete="off">
+    <label for="usr">Usuario</label>
+    <input id="usr" type="text" placeholder="Usuario" autocomplete="username" autocapitalize="none">
+    <label for="pin" style="margin-top:12px">Contraseña</label>
+    <input id="pin" type="password" placeholder="••••" autocomplete="current-password">
     <div id="loginErr" class="err"></div>
     <button id="btnLogin">Ingresar</button>
   </section>
@@ -82,17 +85,17 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script>
-const VERSION = 'V2.0';
+const VERSION = 'V2.1';
 const API = 'https://script.google.com/macros/s/AKfycbzMpPl3zmXfQaGcZ1IcDG9wnPFv2LqhG8iqaqoqRgOzMpZf4h3qrcD73M2ElsGLJgKM/exec';
 const $ = id => document.getElementById(id);
 $('ver').textContent = 'Happy Fest · ' + VERSION;
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-let PIN = '', busy = false, scanner = null, modo = 'qr', pendiente = null;
+let USR = '', PIN = '', busy = false, scanner = null, modo = 'qr', pendiente = null;
 const TAG = () => VERSION + ' · …' + API.slice(-12);
 
 // OJO: el parámetro del código se llama "x" (con "c" Google rechaza el pedido).
 async function call(p) {
-  const r = await fetch(API + '?' + new URLSearchParams({ ...p, pin: PIN }));
+  const r = await fetch(API + '?' + new URLSearchParams({ ...p, usr: USR, pin: PIN }));
   const t = await r.text();
   try { return JSON.parse(t); }
   catch (e) {
@@ -211,24 +214,27 @@ function cambiarModo(m) {
 }
 
 async function login() {
+  USR = $('usr').value.trim();
   PIN = $('pin').value.trim();
   const err = $('loginErr'), b = $('btnLogin');
   err.textContent = '';
-  if (!PIN) { err.textContent = 'Ingresá el PIN'; return; }
+  if (!USR || !PIN) { err.textContent = 'Ingresá usuario y contraseña'; return; }
   b.disabled = true; b.textContent = 'Verificando…';
   try {
     const r = await call({ a: 'stats' });
-    if (!r.ok) { err.textContent = 'PIN incorrecto'; return; }
+    if (!r.ok) { err.textContent = 'Usuario o contraseña incorrectos'; return; }
   } catch (e) {
     err.textContent = 'No se pudo conectar: ' + (e && e.message ? e.message : e) + ' (' + TAG() + ')';
     return;
   } finally { b.disabled = false; b.textContent = 'Ingresar'; }
+  $('ver').textContent = 'Happy Fest · ' + VERSION + ' · ' + USR;
   $('login').classList.add('hide');
   $('app').classList.remove('hide');
   stats(); arrancar();
 }
 
 $('btnLogin').onclick = login;
+$('usr').addEventListener('keydown', e => { if (e.key === 'Enter') $('pin').focus(); });
 $('pin').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
 $('tabQr').onclick = () => cambiarModo('qr');
 $('tabDni').onclick = () => cambiarModo('dni');
