@@ -76,9 +76,14 @@
     </div>
 
     <div id="boxDni" class="hide">
-      <input id="nombre" placeholder="Nombre">
+      <input id="nombre" placeholder="Nombre (obligatorio)">
       <input id="apellido" placeholder="Apellido">
       <input id="dni" inputmode="numeric" placeholder="DNI">
+      <select id="medio">
+        <option value="">Medio de pago (obligatorio)</option>
+        <option value="Efectivo">Efectivo</option>
+        <option value="MP Sucovi">MP Sucovi</option>
+      </select>
       <button id="btnVenta">Registrar venta y dejar ingresar</button>
     </div>
     <div id="stats"></div>
@@ -89,7 +94,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script>
-const VERSION = 'V2.3';
+const VERSION = 'V2.4';
 const API = 'https://script.google.com/macros/s/AKfycbzMpPl3zmXfQaGcZ1IcDG9wnPFv2LqhG8iqaqoqRgOzMpZf4h3qrcD73M2ElsGLJgKM/exec';
 const $ = id => document.getElementById(id);
 $('ver').textContent = 'Happy Fest · ' + VERSION;
@@ -265,9 +270,17 @@ $('tabQr').onclick = () => cambiarModo('qr');
 $('tabDni').onclick = () => cambiarModo('dni');
 $('btnCodigo').onclick = () => { verificar($('codigo').value); $('codigo').value = ''; };
 $('btnVenta').onclick = () => {
-  if (!$('nombre').value.trim() && !$('apellido').value.trim()) return alert('Falta el nombre');
-  seguro(() => call({ a: 'venta', nombre: $('nombre').value, apellido: $('apellido').value, dni: $('dni').value }))
-    .then(() => { $('nombre').value = $('apellido').value = $('dni').value = ''; });
+  if (!$('nombre').value.trim()) return alert('Falta el nombre');
+  if (!$('medio').value) return alert('Elegí el medio de pago');
+  seguro(() => call({
+    a: 'venta',
+    nombre: $('nombre').value,
+    apellido: $('apellido').value,
+    dni: $('dni').value,
+    medio: $('medio').value
+  })).then(r => {
+    if (r && r.ok) { $('nombre').value = $('apellido').value = $('dni').value = ''; $('medio').value = ''; }
+  });
 };
 </script>
 </body>
