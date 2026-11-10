@@ -5,34 +5,55 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Happy Fest - Puerta</title>
 <style>
+  :root{--navy:#1E2A5A;--gold:#FFD166;--ink:#0f1535}
   *{box-sizing:border-box}
-  body{margin:0;font-family:system-ui,sans-serif;background:#111827;color:#fff}
-  main{max-width:480px;margin:0 auto;padding:14px}
-  h1{font-size:1.2rem;text-align:center;margin:6px 0 12px}
-  input,button{font-size:1.05rem;padding:12px;border-radius:10px;border:0;width:100%;margin-top:8px}
+  body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,sans-serif;color:#fff;
+       background:radial-gradient(circle at 50% -10%,#2c3c83 0%,var(--navy) 40%,var(--ink) 100%) fixed}
+  main{max-width:480px;margin:0 auto;padding:18px 14px 28px}
+  header{text-align:center;margin:10px 0 18px}
+  .logo{font-size:2.6rem;line-height:1}
+  header h1{font-size:1.7rem;margin:6px 0 0;letter-spacing:.5px;color:var(--gold)}
+  header p{margin:2px 0 0;opacity:.75;font-size:.95rem;letter-spacing:2px;text-transform:uppercase}
+  input,button{font-size:1.05rem;padding:13px;border-radius:12px;border:0;width:100%;margin-top:8px;font-family:inherit}
   input{background:#fff;color:#111}
-  button{background:#2563eb;color:#fff;font-weight:600}
-  button.sec{background:#374151}
-  .tabs{display:flex;gap:8px}.tabs button{margin:0}
-  .tabs button.on{background:#2563eb}.tabs button:not(.on){background:#374151}
-  #reader{width:100%;border-radius:12px;overflow:hidden;margin-top:10px;min-height:120px;background:#000}
-  #res{margin-top:10px;padding:22px 14px;border-radius:14px;text-align:center;display:none}
+  button{background:var(--gold);color:var(--navy);font-weight:700}
+  button:disabled{opacity:.6}
+  button.sec{background:rgba(255,255,255,.14);color:#fff}
+  .card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:20px 16px;margin-top:26px;
+        box-shadow:0 10px 30px rgba(0,0,0,.25)}
+  .card label{display:block;font-size:.85rem;opacity:.8;margin-bottom:2px}
+  .card input{text-align:center;font-size:1.3rem;letter-spacing:4px}
+  .err{color:#ffb4b4;text-align:center;min-height:1.3em;margin-top:8px;font-size:.95rem}
+  .tabs{display:flex;gap:8px}.tabs button{margin:0;font-size:.95rem}
+  .tabs button.on{background:var(--gold);color:var(--navy)}
+  .tabs button:not(.on){background:rgba(255,255,255,.14);color:#fff}
+  #reader{width:100%;border-radius:14px;overflow:hidden;margin-top:10px;min-height:120px;background:#000}
+  #res{margin-top:10px;padding:22px 14px;border-radius:16px;text-align:center;display:none}
   #res b{display:block;font-size:1.7rem;margin-bottom:6px}
+  #res .nom{font-size:1.25rem}
   .ok{background:#16a34a}.warn{background:#d97706}.bad{background:#dc2626}
-  #stats{text-align:center;opacity:.8;margin-top:12px}
+  .acts{display:flex;gap:8px;margin-top:16px}.acts button{margin:0}
+  #btnEntrar{flex:2;background:#fff;color:#15803d;font-size:1.25rem;padding:16px}
+  #btnCancel{flex:1;background:rgba(0,0,0,.25);color:#fff}
+  #stats{text-align:center;opacity:.8;margin-top:12px;font-size:.95rem}
+  footer{text-align:center;opacity:.45;font-size:.75rem;margin-top:22px}
   .hide{display:none}
 </style>
 </head>
 <body>
 <main>
-  <h1>Happy Fest - Control de puerta <small id="ver" style="opacity:.6;font-weight:400"></small></h1>
+  <header>
+    <div class="logo">🎉</div>
+    <h1>Happy Fest</h1>
+    <p>Control de puerta</p>
+  </header>
 
-  <div id="login">
-    <input id="pin" type="password" placeholder="PIN del personal" autocomplete="off">
+  <section id="login" class="card">
+    <label for="pin">PIN del personal</label>
+    <input id="pin" type="password" placeholder="••••" autocomplete="off">
+    <div id="loginErr" class="err"></div>
     <button id="btnLogin">Ingresar</button>
-    <button id="btnDiag" class="sec">Diagnóstico</button>
-    <pre id="diag" style="white-space:pre-wrap;word-break:break-all;font-size:.8rem;margin-top:10px"></pre>
-  </div>
+  </section>
 
   <div id="app" class="hide">
     <div class="tabs">
@@ -55,17 +76,21 @@
     </div>
     <div id="stats"></div>
   </div>
+
+  <footer id="ver"></footer>
 </main>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script>
-const VERSION = 'V1.6';
+const VERSION = 'V2.0';
 const API = 'https://script.google.com/macros/s/AKfycbzMpPl3zmXfQaGcZ1IcDG9wnPFv2LqhG8iqaqoqRgOzMpZf4h3qrcD73M2ElsGLJgKM/exec';
-document.getElementById('ver').textContent = VERSION;
 const $ = id => document.getElementById(id);
-let PIN = '', busy = false, scanner = null, modo = 'qr';
+$('ver').textContent = 'Happy Fest · ' + VERSION;
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+let PIN = '', busy = false, scanner = null, modo = 'qr', pendiente = null;
 const TAG = () => VERSION + ' · …' + API.slice(-12);
 
+// OJO: el parámetro del código se llama "x" (con "c" Google rechaza el pedido).
 async function call(p) {
   const r = await fetch(API + '?' + new URLSearchParams({ ...p, pin: PIN }));
   const t = await r.text();
@@ -77,35 +102,67 @@ async function call(p) {
 
 const MSG = {
   VALIDA:       ['ok',   'ENTRADA VÁLIDA'],
+  INGRESO_OK:   ['ok',   'INGRESO REGISTRADO'],
   YA_INGRESO:   ['warn', 'YA INGRESÓ'],
   NO_EXISTE:    ['bad',  'NO EXISTE O NO ESTÁ PAGADA'],
-  VENTA_OK:     ['ok',   'VENTA REGISTRADA - PUEDE PASAR'],
+  VENTA_OK:     ['ok',   'VENTA REGISTRADA - PUEDE INGRESAR'],
   DNI_REPETIDO: ['warn', 'ESTE DNI YA FUE REGISTRADO']
 };
 
 function show(r) {
   const el = $('res');
   el.style.display = 'block';
-  if (!r.ok) { el.className = 'bad'; el.innerHTML = '<b>Error</b>' + r.error; return; }
-  const [cls, txt] = MSG[r.estado] || ['bad', 'RESPUESTA INESPERADA: ' + JSON.stringify(r)];
+  if (!r.ok) { el.className = 'bad'; el.innerHTML = '<b>Error</b>' + (r.html || esc(r.error)); return; }
+  const [cls, txt] = MSG[r.estado] || ['bad', 'RESPUESTA INESPERADA: ' + esc(JSON.stringify(r))];
   el.className = cls;
-  el.innerHTML = '<b>' + txt + '</b>' + (r.nombre || '') +
-    (r.familia ? '<br><small>Invita: ' + r.familia + '</small>' : '') +
-    (r.hora ? '<br><small>Hora de ingreso: ' + r.hora + '</small>' : '');
+  el.innerHTML = '<b>' + txt + '</b>' + (r.nombre ? '<div class="nom">' + esc(r.nombre) + '</div>' : '') +
+    (r.familia ? '<small>Invita: ' + esc(r.familia) + '</small>' : '') +
+    (r.hora ? '<br><small>Hora de ingreso: ' + esc(r.hora) + '</small>' : '');
+  if (r.estado === 'VALIDA' && pendiente) {
+    el.innerHTML += '<div class="acts"><button id="btnEntrar">DAR INGRESO</button><button id="btnCancel">Cancelar</button></div>';
+    $('btnEntrar').onclick = entrar;
+    $('btnCancel').onclick = cancelar;
+  }
   navigator.vibrate && navigator.vibrate(cls === 'ok' ? 100 : [200, 100, 200]);
   stats();
 }
 
 async function seguro(fn) {
-  try { show(await fn()); } catch (e) {
-    show({ ok: false, error: 'No se pudo consultar (' + (e && e.message ? e.message : e) + ')<br><small>' + TAG() + '<br>Si persiste, usá el Plan B (planilla).</small>' });
+  try { const r = await fn(); show(r); return r; }
+  catch (e) {
+    show({ ok: false, html: 'No se pudo consultar (' + esc(e && e.message ? e.message : e) + ')<br><small>' + esc(TAG()) + '<br>Si persiste, usá el Plan B (planilla).</small>' });
+    return null;
   }
 }
 
-function verificar(code) {
+async function verificar(code) {
   if (busy || !code) return;
   busy = true;
-  seguro(() => call({ a: 'check', x: code.trim() })).finally(() => setTimeout(() => busy = false, 2500));
+  code = code.trim();
+  pendiente = null;
+  // Primero solo consulta: NO marca el ingreso.
+  const r = await seguro(() => call({ a: 'check', x: code }));
+  if (r && r.ok && r.estado === 'VALIDA') {
+    pendiente = code;
+    show(r); // se vuelve a dibujar ya con los botones; el escáner queda frenado hasta decidir
+  } else {
+    setTimeout(() => busy = false, 2500);
+  }
+}
+
+async function entrar() {
+  const b = $('btnEntrar');
+  b.disabled = true; b.textContent = 'Registrando…';
+  const code = pendiente;
+  const r = await seguro(() => call({ a: 'ingresar', x: code }));
+  pendiente = null;
+  setTimeout(() => busy = false, r && r.ok && r.estado === 'INGRESO_OK' ? 1500 : 2500);
+}
+
+function cancelar() {
+  pendiente = null;
+  $('res').style.display = 'none';
+  setTimeout(() => busy = false, 800);
 }
 
 async function stats() {
@@ -144,6 +201,7 @@ async function arrancar() {
 
 function cambiarModo(m) {
   modo = m;
+  pendiente = null; busy = false;
   $('tabQr').className = m === 'qr' ? 'on' : '';
   $('tabDni').className = m === 'dni' ? 'on' : '';
   $('boxQr').classList.toggle('hide', m !== 'qr');
@@ -152,31 +210,26 @@ function cambiarModo(m) {
   arrancar();
 }
 
-$('btnLogin').onclick = async () => {
+async function login() {
   PIN = $('pin').value.trim();
+  const err = $('loginErr'), b = $('btnLogin');
+  err.textContent = '';
+  if (!PIN) { err.textContent = 'Ingresá el PIN'; return; }
+  b.disabled = true; b.textContent = 'Verificando…';
   try {
     const r = await call({ a: 'stats' });
-    if (!r.ok) return alert('PIN incorrecto');
-  } catch (e) { return alert('No se pudo conectar: ' + (e && e.message ? e.message : e) + '\n' + TAG()); }
+    if (!r.ok) { err.textContent = 'PIN incorrecto'; return; }
+  } catch (e) {
+    err.textContent = 'No se pudo conectar: ' + (e && e.message ? e.message : e) + ' (' + TAG() + ')';
+    return;
+  } finally { b.disabled = false; b.textContent = 'Ingresar'; }
   $('login').classList.add('hide');
   $('app').classList.remove('hide');
   stats(); arrancar();
-};
-$('btnDiag').onclick = async () => {
-  PIN = $('pin').value.trim();
-  const out = $('diag');
-  out.textContent = TAG() + '\n';
-  for (const q of ['a=stats', 'a=buscar&x=B21CA5260267', 'a=check&x=ZZZ']) {
-    const t0 = Date.now();
-    try {
-      const r = await fetch(API + '?pin=' + encodeURIComponent(PIN) + '&' + q);
-      const t = await r.text();
-      out.textContent += q + ' → HTTP ' + r.status + ' · ' + (Date.now() - t0) + ' ms · ' + t.slice(0, 90) + '\n';
-    } catch (e) {
-      out.textContent += q + ' → FALLÓ · ' + (Date.now() - t0) + ' ms\n';
-    }
-  }
-};
+}
+
+$('btnLogin').onclick = login;
+$('pin').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
 $('tabQr').onclick = () => cambiarModo('qr');
 $('tabDni').onclick = () => cambiarModo('dni');
 $('btnCodigo').onclick = () => { verificar($('codigo').value); $('codigo').value = ''; };
