@@ -57,15 +57,20 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script>
-const VERSION = 'V1.2';
+const VERSION = 'V1.3';
 const API = 'https://script.google.com/macros/s/AKfycbwaVJgCTGQ4krHzAShOFn7FLftGmKsuza_SaxUTmr4au5uvj9Z0vAmgVqtyElvs2229/exec';
 document.getElementById('ver').textContent = VERSION;
 const $ = id => document.getElementById(id);
 let PIN = '', busy = false, scanner = null, modo = 'qr';
+const TAG = () => VERSION + ' · …' + API.slice(-12);
 
 async function call(p) {
   const r = await fetch(API + '?' + new URLSearchParams({ ...p, pin: PIN }));
-  return r.json();
+  const t = await r.text();
+  try { return JSON.parse(t); }
+  catch (e) {
+    throw new Error('respuesta no válida, HTTP ' + r.status + ': ' + t.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 80));
+  }
 }
 
 const MSG = {
@@ -90,7 +95,9 @@ function show(r) {
 }
 
 async function seguro(fn) {
-  try { show(await fn()); } catch (e) { show({ ok: false, error: 'No se pudo consultar (' + (e && e.message ? e.message : e) + '). Si persiste, usá el Plan B (planilla).' }); }
+  try { show(await fn()); } catch (e) {
+    show({ ok: false, error: 'No se pudo consultar (' + (e && e.message ? e.message : e) + ')<br><small>' + TAG() + '<br>Si persiste, usá el Plan B (planilla).</small>' });
+  }
 }
 
 function verificar(code) {
@@ -148,7 +155,7 @@ $('btnLogin').onclick = async () => {
   try {
     const r = await call({ a: 'stats' });
     if (!r.ok) return alert('PIN incorrecto');
-  } catch (e) { return alert('No hay conexión con el servidor'); }
+  } catch (e) { return alert('No se pudo conectar: ' + (e && e.message ? e.message : e) + '\n' + TAG()); }
   $('login').classList.add('hide');
   $('app').classList.remove('hide');
   stats(); arrancar();
