@@ -32,20 +32,28 @@
   .switch button{position:relative;z-index:1;flex:1;margin:0;background:transparent;color:#fff;border-radius:999px;font-size:.95rem;padding:12px 6px;transition:color .25s}
   .switch button.on{color:var(--navy)}
   #reader{width:100%;border-radius:14px;overflow:hidden;margin-top:10px;min-height:120px;background:#000}
+  #rw{position:relative;overflow:hidden;border-radius:14px;margin-top:10px}
+  #rw #reader{margin-top:0}
+  /* Modo DNI: ventana baja y ancha (se recorta la imagen al centro) con una guía para el PDF417 */
+  #guide{display:none;position:absolute;left:50%;top:50%;width:90%;height:100px;transform:translate(-50%,-50%);
+         border:3px solid var(--gold);border-radius:10px;box-shadow:0 0 0 999px rgba(0,0,0,.35);pointer-events:none;z-index:2}
+  #rw.dni #guide{display:block}
+  #rw.dni #reader{height:190px;min-height:0;position:relative}
+  #rw.dni #reader video{position:absolute!important;left:0;top:50%;width:100%!important;height:auto!important;transform:translateY(-50%)}
 
   /* Cartel de resultado: tapa toda la pantalla y hay que cerrarlo para seguir escaneando */
   #ov{position:fixed;inset:0;z-index:50;background:rgba(5,8,25,.82);display:flex;align-items:center;justify-content:center;padding:16px}
   #ov.hide{display:none}
   #res{width:100%;max-width:440px;padding:28px 18px 20px;border-radius:20px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.5)}
   #res b{display:block;font-size:1.7rem;margin-bottom:8px}
-  #res .nom{font-size:1.35rem}
+  #res .nom{font-size:2.2rem;font-weight:700;line-height:1.15;margin:4px 0 6px;word-break:break-word}
+  #res small{font-size:1rem}
   .ok{background:#16a34a}.warn{background:#d97706}.bad{background:#dc2626}
   .acts{display:flex;gap:8px;margin-top:20px}.acts button{margin:0}
   #btnEntrar{flex:2;background:#fff;color:#15803d;font-size:1.25rem;padding:16px}
   #btnCancel{flex:1;background:rgba(0,0,0,.25);color:#fff}
   #btnCerrar{background:#fff;color:var(--navy);font-size:1.25rem;padding:16px;margin-top:20px}
 
-  #stats{text-align:center;opacity:.8;margin-top:12px;font-size:.95rem}
   footer{text-align:center;opacity:.45;font-size:.75rem;margin-top:22px}
   .hide{display:none}
 </style>
@@ -55,7 +63,7 @@
   <header id="hdr">
     <div class="logo"><img src="img/logo.jpg" alt="Happy Fest" onerror="this.replaceWith(document.createTextNode('🎉'))"></div>
     <h1>Happy Fest</h1>
-    <p>Control de puerta</p>
+    <p>Control de ingreso</p>
   </header>
 
   <section id="login" class="card">
@@ -73,7 +81,7 @@
       <button id="tabQr" class="on">Escanear (QR)</button>
       <button id="tabDni">Venta en puerta (DNI)</button>
     </div>
-    <div id="reader"></div>
+    <div id="rw"><div id="reader"></div><div id="guide"></div></div>
 
     <div id="boxQr">
       <input id="codigo" placeholder="Código manual (si el QR no lee)" autocapitalize="characters">
@@ -91,7 +99,6 @@
       </select>
       <button id="btnVenta">Registrar venta y dejar ingresar</button>
     </div>
-    <div id="stats"></div>
   </div>
 
   <footer id="ver"></footer>
@@ -102,7 +109,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script>
-const VERSION = 'V2.5';
+const VERSION = 'V2.6';
 const API = 'https://script.google.com/macros/s/AKfycbzMpPl3zmXfQaGcZ1IcDG9wnPFv2LqhG8iqaqoqRgOzMpZf4h3qrcD73M2ElsGLJgKM/exec';
 const $ = id => document.getElementById(id);
 $('ver').textContent = 'Happy Fest · ' + VERSION;
@@ -130,6 +137,36 @@ const MSG = {
   DNI_REPETIDO: ['warn', 'ESTE DNI YA FUE REGISTRADO']
 };
 
+// ---- Sonido de confirmación (ingreso o venta exitosa) ----
+// Cambiá el número para elegir el sonido: 1 Ding · 2 Doble bip · 3 Acorde · 4 Caja registradora · 5 Campanita
+const SONIDO = 1;
+let AC = null;
+function audio() {
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    if (AC.state === 'suspended') AC.resume();
+  } catch (e) {}
+  return AC;
+}
+function tono(f, t0, dur, tipo, vol) {
+  const t = AC.currentTime + t0, o = AC.createOscillator(), g = AC.createGain();
+  o.type = tipo || 'sine';
+  o.frequency.setValueAtTime(f, t);
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(vol || 0.3, t + 0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g); g.connect(AC.destination);
+  o.start(t); o.stop(t + dur + 0.05);
+}
+const SONIDOS = {
+  1: () => { tono(880, 0, 0.5, 'sine', 0.35); tono(1760, 0, 0.3, 'sine', 0.08); },
+  2: () => { tono(660, 0, 0.12, 'square', 0.15); tono(990, 0.14, 0.22, 'square', 0.15); },
+  3: () => { [523.25, 659.25, 783.99].forEach((f, i) => tono(f, i * 0.09, 0.4, 'triangle', 0.28)); },
+  4: () => { tono(1318.5, 0, 0.25, 'triangle', 0.28); tono(1760, 0.12, 0.55, 'triangle', 0.28); },
+  5: () => { tono(1568, 0, 0.9, 'sine', 0.22); tono(2349, 0, 0.6, 'sine', 0.1); tono(3136, 0, 0.4, 'sine', 0.05); }
+};
+function sonarOk() { if (!audio()) return; try { SONIDOS[SONIDO](); } catch (e) {} }
+
 // Muestra el cartel. Queda abierto hasta que la persona toque un botón.
 function show(r) {
   busy = true;
@@ -156,7 +193,7 @@ function show(r) {
     $('btnCerrar').onclick = cerrar;
   }
   navigator.vibrate && navigator.vibrate(cls === 'ok' ? 100 : [200, 100, 200]);
-  stats();
+  if (r.ok && (r.estado === 'INGRESO_OK' || r.estado === 'VENTA_OK')) sonarOk();
 }
 
 // Cierra el cartel y vuelve a habilitar el escaneo.
@@ -190,18 +227,12 @@ async function verificar(code) {
 }
 
 async function entrar() {
+  audio();
   const b = $('btnEntrar');
   b.disabled = true; b.textContent = 'Registrando…';
   const code = pendiente;
   await seguro(() => call({ a: 'ingresar', x: code }));
   pendiente = null; // el cartel nuevo (con datos del ingreso) queda hasta que toquen Aceptar
-}
-
-async function stats() {
-  try {
-    const r = await call({ a: 'stats' });
-    if (r.ok) $('stats').textContent = 'Ingresaron ' + r.ingresaron + ' de ' + r.total + ' entradas · Servidor ' + (r.version || 'V1.0');
-  } catch (e) {}
 }
 
 /* DNI argentino (PDF417): NRO_TRAMITE@APELLIDO@NOMBRE@SEXO@DNI@EJEMPLAR@NACIMIENTO@EMISION... */
@@ -221,8 +252,9 @@ async function arrancar() {
     experimentalFeatures: { useBarCodeDetectorIfSupported: true },
     verbose: false
   });
-  const box = modo === 'qr' ? { width: 250, height: 250 } : { width: 320, height: 130 };
-  scanner.start({ facingMode: 'environment' }, { fps: 10, qrbox: box }, txt => {
+  // En modo DNI no se usa qrbox: se lee todo el cuadro y el rectángulo de la pantalla es solo una guía visual
+  const cfg = modo === 'qr' ? { fps: 10, qrbox: { width: 250, height: 250 } } : { fps: 10 };
+  scanner.start({ facingMode: 'environment' }, cfg, txt => {
     if (busy) return; // hay un cartel abierto: no se escanea nada hasta cerrarlo
     if (modo === 'qr') return verificar(txt);
     const d = parseDni(txt);
@@ -239,12 +271,14 @@ function cambiarModo(m) {
   $('tabQr').className = m === 'qr' ? 'on' : '';
   $('tabDni').className = m === 'dni' ? 'on' : '';
   $('sw').dataset.modo = m;
+  $('rw').classList.toggle('dni', m === 'dni');
   $('boxQr').classList.toggle('hide', m !== 'qr');
   $('boxDni').classList.toggle('hide', m !== 'dni');
   arrancar();
 }
 
 async function login() {
+  audio(); // desbloquea el sonido (el celular lo exige tras un toque)
   USR = $('usr').value.trim();
   PIN = $('pin').value.trim();
   const err = $('loginErr'), b = $('btnLogin');
@@ -262,7 +296,7 @@ async function login() {
   $('hdr').classList.add('hide');
   $('login').classList.add('hide');
   $('app').classList.remove('hide');
-  stats(); arrancar();
+  arrancar();
 }
 
 let usuariosOk = false;
@@ -293,6 +327,7 @@ $('btnVenta').onclick = () => {
   if (busy) return;
   if (!$('nombre').value.trim()) return alert('Falta el nombre');
   if (!$('medio').value) return alert('Elegí el medio de pago');
+  audio();
   busy = true; // evita doble toque; se libera al cerrar el cartel
   seguro(() => call({
     a: 'venta',
