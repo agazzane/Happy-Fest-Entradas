@@ -78,7 +78,7 @@ function show(r) {
   const el = $('res');
   el.style.display = 'block';
   if (!r.ok) { el.className = 'bad'; el.innerHTML = '<b>Error</b>' + r.error; return; }
-  const [cls, txt] = MSG[r.estado];
+  const [cls, txt] = MSG[r.estado] || ['bad', 'RESPUESTA INESPERADA: ' + JSON.stringify(r)];
   el.className = cls;
   el.innerHTML = '<b>' + txt + '</b>' + (r.nombre || '') +
     (r.familia ? '<br><small>Invita: ' + r.familia + '</small>' : '') +
@@ -88,7 +88,7 @@ function show(r) {
 }
 
 async function seguro(fn) {
-  try { show(await fn()); } catch (e) { show({ ok: false, error: 'Sin conexión. Usá el Plan B (planilla).' }); }
+  try { show(await fn()); } catch (e) { show({ ok: false, error: 'No se pudo consultar (' + (e && e.message ? e.message : e) + '). Si persiste, usá el Plan B (planilla).' }); }
 }
 
 function verificar(code) {
