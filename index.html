@@ -70,7 +70,7 @@
     <label for="usr">Usuario</label>
     <select id="usr"><option value="">Cargando usuarios…</option></select>
     <label for="pin" style="margin-top:12px">Contraseña</label>
-    <input id="pin" type="password" placeholder="••••" autocomplete="current-password">
+    <input id="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="••••" autocomplete="current-password">
     <div id="loginErr" class="err"></div>
     <button id="btnLogin">Ingresar</button>
   </section>
@@ -109,7 +109,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script>
-const VERSION = 'V2.6';
+const VERSION = 'V2.7';
 const API = 'https://script.google.com/macros/s/AKfycbzMpPl3zmXfQaGcZ1IcDG9wnPFv2LqhG8iqaqoqRgOzMpZf4h3qrcD73M2ElsGLJgKM/exec';
 const $ = id => document.getElementById(id);
 $('ver').textContent = 'Happy Fest · ' + VERSION;
@@ -139,7 +139,7 @@ const MSG = {
 
 // ---- Sonido de confirmación (ingreso o venta exitosa) ----
 // Cambiá el número para elegir el sonido: 1 Ding · 2 Doble bip · 3 Acorde · 4 Caja registradora · 5 Campanita
-const SONIDO = 1;
+const SONIDO = 4;
 let AC = null;
 function audio() {
   try {
@@ -284,6 +284,7 @@ async function login() {
   const err = $('loginErr'), b = $('btnLogin');
   err.textContent = '';
   if (!USR || !PIN) { err.textContent = 'Elegí tu usuario y escribí la contraseña'; return; }
+  if (!/^\d{4,6}$/.test(PIN)) { err.textContent = 'La contraseña tiene entre 4 y 6 números'; return; }
   b.disabled = true; b.textContent = 'Verificando…';
   try {
     const r = await call({ a: 'stats' });
@@ -319,6 +320,10 @@ cargarUsuarios();
 
 $('btnLogin').onclick = login;
 $('usr').addEventListener('keydown', e => { if (e.key === 'Enter') $('pin').focus(); });
+// Al elegir el usuario, pasa directo a la contraseña y abre el teclado numérico
+$('usr').addEventListener('change', () => { if ($('usr').value) $('pin').focus(); });
+// Solo números en la contraseña
+$('pin').addEventListener('input', () => { $('pin').value = $('pin').value.replace(/\D/g, '').slice(0, 6); });
 $('pin').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
 $('tabQr').onclick = () => cambiarModo('qr');
 $('tabDni').onclick = () => cambiarModo('dni');
