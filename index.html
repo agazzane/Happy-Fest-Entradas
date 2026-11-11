@@ -24,7 +24,10 @@
         box-shadow:0 10px 30px rgba(0,0,0,.25)}
   .card label{display:block;font-size:.85rem;opacity:.8;margin-bottom:2px}
   .card input{text-align:center;font-size:1.3rem;letter-spacing:4px}
-  #usr{font-size:1.15rem;text-align-last:center}
+  #usr,#fiesta{font-size:1.15rem;text-align-last:center}
+  #bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+  #barTxt{font-weight:700;color:var(--gold);font-size:1.1rem}
+  #btnSalir{width:auto;margin:0;padding:8px 16px;font-size:.95rem}
   .err{color:#ffb4b4;text-align:center;min-height:1.3em;margin-top:8px;font-size:.95rem}
   .switch{position:relative;display:flex;background:rgba(255,255,255,.14);border-radius:999px;padding:4px}
   .switch .thumb{position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);background:var(--gold);border-radius:999px;transition:transform .25s ease}
@@ -70,7 +73,9 @@
   </header>
 
   <section id="login" class="card">
-    <label for="usr">Usuario</label>
+    <label for="fiesta">Fiesta</label>
+    <select id="fiesta"><option value="">Elegí la fiesta</option><option>Fiesta 1</option><option>Fiesta 2</option></select>
+    <label for="usr" style="margin-top:12px">Usuario</label>
     <select id="usr"><option value="">Cargando usuarios…</option></select>
     <label for="pin" style="margin-top:12px">Contraseña</label>
     <input id="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="••••" autocomplete="current-password">
@@ -79,6 +84,7 @@
   </section>
 
   <div id="app" class="hide">
+    <div id="bar"><span id="barTxt"></span><button id="btnSalir" class="sec">Salir</button></div>
     <div class="switch" id="sw" data-modo="qr">
       <div class="thumb"></div>
       <button id="tabQr" class="on">Escanear (QR)</button>
@@ -112,18 +118,18 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script>
-const VERSION = 'V2.8';
+const VERSION = 'V2.9';
 const API = 'https://script.google.com/macros/s/AKfycbzMpPl3zmXfQaGcZ1IcDG9wnPFv2LqhG8iqaqoqRgOzMpZf4h3qrcD73M2ElsGLJgKM/exec';
 const $ = id => document.getElementById(id);
 $('ver').textContent = 'Happy Fest · ' + VERSION;
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 // busy = true mientras hay un cartel abierto o una consulta en curso: no se acepta ningún escaneo nuevo.
-let USR = '', PIN = '', busy = false, scanner = null, modo = 'qr', pendiente = null;
+let USR = '', PIN = '', FIESTA = '', busy = false, scanner = null, modo = 'qr', pendiente = null;
 const TAG = () => VERSION + ' · …' + API.slice(-12);
 
 // OJO: el parámetro del código se llama "x" (con "c" Google rechaza el pedido).
 async function call(p) {
-  const r = await fetch(API + '?' + new URLSearchParams({ ...p, usr: USR, pin: PIN }));
+  const r = await fetch(API + '?' + new URLSearchParams({ ...p, usr: USR, pin: PIN, fiesta: FIESTA }));
   const t = await r.text();
   try { return JSON.parse(t); }
   catch (e) {
@@ -137,7 +143,8 @@ const MSG = {
   YA_INGRESO:   ['warn', 'YA INGRESÓ'],
   NO_EXISTE:    ['bad',  'NO EXISTE O NO ESTÁ PAGADA'],
   VENTA_OK:     ['ok',   'VENTA REGISTRADA - PUEDE INGRESAR'],
-  DNI_REPETIDO: ['warn', 'ESTE DNI YA FUE REGISTRADO']
+  DNI_REPETIDO: ['warn', 'ESTE DNI YA FUE REGISTRADO'],
+  OTRA_FIESTA:  ['bad',  'ENTRADA DE OTRA FIESTA']
 };
 
 // ---- Sonido de confirmación (ingreso o venta exitosa) ----
@@ -183,6 +190,7 @@ function show(r) {
     let txt;
     [cls, txt] = MSG[r.estado] || ['bad', 'RESPUESTA INESPERADA: ' + esc(JSON.stringify(r))];
     html = '<b>' + txt + '</b>' + (r.nombre ? '<div class="nom">' + esc(r.nombre) + '</div>' : '') +
+      (r.estado === 'OTRA_FIESTA' ? '<div class="dato">Es de ' + esc(r.fiesta) + '</div>' : '') +
       (r.familia ? '<small>Invita: ' + esc(r.familia) + '</small>' : '') +
       (r.hora ? '<br><small>Hora de ingreso: ' + esc(r.hora) + '</small>' : '');
   }
@@ -219,7 +227,7 @@ function confirmarVenta(d) {
   const el = $('res');
   $('ov').classList.remove('hide');
   el.className = 'info';
-  el.innerHTML = '<b>VENTA EN PUERTA</b><div class="nom">' + esc(nombreCompleto) + '</div>' +
+  el.innerHTML = '<b>VENTA EN PUERTA</b><small>' + esc(FIESTA) + '</small><div class="nom">' + esc(nombreCompleto) + '</div>' +
     '<div class="dato">DNI: ' + (d.dni ? esc(d.dni) : '—') + '</div>' +
     '<select id="medioV"><option value="">Medio de pago (obligatorio)</option>' +
     MEDIOS.map(m => '<option value="' + esc(m) + '">' + esc(m) + '</option>').join('') + '</select>' +
@@ -313,10 +321,12 @@ function cambiarModo(m) {
 
 async function login() {
   audio(); // desbloquea el sonido (el celular lo exige tras un toque)
+  FIESTA = $('fiesta').value;
   USR = $('usr').value.trim();
   PIN = $('pin').value.trim();
   const err = $('loginErr'), b = $('btnLogin');
   err.textContent = '';
+  if (!FIESTA) { err.textContent = 'Elegí la fiesta'; return; }
   if (!USR || !PIN) { err.textContent = 'Elegí tu usuario y escribí la contraseña'; return; }
   if (!/^\d{4,6}$/.test(PIN)) { err.textContent = 'La contraseña tiene entre 4 y 6 números'; return; }
   b.disabled = true; b.textContent = 'Verificando…';
@@ -327,7 +337,8 @@ async function login() {
     err.textContent = 'No se pudo conectar: ' + (e && e.message ? e.message : e) + ' (' + TAG() + ')';
     return;
   } finally { b.disabled = false; b.textContent = 'Ingresar'; }
-  $('ver').textContent = 'Happy Fest · ' + VERSION + ' · ' + USR;
+  $('ver').textContent = 'Happy Fest · ' + VERSION + ' · ' + USR + ' · ' + FIESTA;
+  $('barTxt').textContent = FIESTA + ' · ' + USR;
   $('hdr').classList.add('hide');
   $('login').classList.add('hide');
   $('app').classList.remove('hide');
@@ -353,6 +364,7 @@ $('usr').addEventListener('focus', () => { if (!usuariosOk) cargarUsuarios(); })
 cargarUsuarios();
 
 $('btnLogin').onclick = login;
+$('btnSalir').onclick = () => { if (confirm('¿Cerrar sesión para cambiar de usuario o de fiesta?')) location.reload(); };
 $('usr').addEventListener('keydown', e => { if (e.key === 'Enter') $('pin').focus(); });
 // Al elegir el usuario, pasa directo a la contraseña y abre el teclado numérico
 $('usr').addEventListener('change', () => { if ($('usr').value) $('pin').focus(); });
