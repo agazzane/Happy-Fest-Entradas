@@ -211,7 +211,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script>
-const VERSION = 'V2.16';
+const VERSION = 'V2.17';
 const API = 'https://script.google.com/macros/s/AKfycbzMpPl3zmXfQaGcZ1IcDG9wnPFv2LqhG8iqaqoqRgOzMpZf4h3qrcD73M2ElsGLJgKM/exec';
 const $ = id => document.getElementById(id);
 $('ver').textContent = 'Happy Fest · ' + VERSION;
@@ -321,7 +321,7 @@ function show(r) {
     [cls, txt] = MSG[r.estado] || ['bad', 'RESPUESTA INESPERADA: ' + esc(JSON.stringify(r))];
     html = '<b>' + txt + '</b>' + (r.nombre ? '<div class="nom">' + esc(r.nombre) + '</div>' : '') +
       (r.estado === 'OTRA_FIESTA' ? '<div class="dato">Es de ' + esc(r.fiesta) + '</div>' : '') +
-      (r.familia ? '<small>Invita: ' + esc(r.familia) + '</small>' : '') +
+      (r.familia ? '<small>Invitado/a por familia: ' + esc(r.familia) + '</small>' : '') +
       (r.hora ? '<br><small>Hora de ingreso: ' + esc(r.hora) + '</small>' : '');
   }
   html = ICO(cls) + html;
