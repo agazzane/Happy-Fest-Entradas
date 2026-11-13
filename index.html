@@ -30,11 +30,13 @@
 
   /* ---- Menú de inicio ---- */
   #home{margin-top:6px;display:flex;flex-direction:column;min-height:calc(100vh - 90px);min-height:calc(100dvh - 90px)}
-  .hlogo{text-align:center;margin:4px 0 22px}
-  .hlogo img{max-width:58%;max-height:110px;object-fit:contain;border-radius:14px;display:inline-block}
+  .htop{display:flex;align-items:center;gap:12px;margin-top:4px}
+  .hbadge{flex:none;width:56px;height:56px;border-radius:15px;background:#fff;color:var(--navy);display:grid;place-items:center;
+          font-size:.62rem;font-weight:700;letter-spacing:.5px;overflow:hidden}
+  .hbadge img{width:100%;height:100%;object-fit:contain;padding:5px}
   .htit{font-size:2rem;line-height:1.15;margin:22px 0 6px}
   .hsub{margin:0 0 6px;font-size:.95rem;color:#cbd2f0}
-  #homeTxt{display:flex;justify-content:flex-start;gap:8px;flex-wrap:wrap;margin:0}
+  #homeTxt{display:flex;justify-content:flex-start;gap:8px;flex-wrap:wrap;margin:0;flex:1;min-width:0}
   #homeTxt span{background:var(--glass);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:.9rem;font-weight:600;color:var(--gold)}
   .hcard{display:flex;align-items:center;gap:16px;text-align:left;margin-top:16px;padding:22px 18px;border-radius:24px;
          background:linear-gradient(160deg,rgba(255,255,255,.14),rgba(255,255,255,.05));color:#fff;
@@ -163,8 +165,10 @@
 
   <!-- Menú de inicio: se ve después del login y al tocar la casita -->
   <div id="home" class="hide">
-    <div class="hlogo"><img src="img/logo.jpg" alt="SUCOVI" onerror="this.parentNode.classList.add('hide')"></div>
-    <div id="homeTxt"></div>
+    <div class="htop">
+      <span class="hbadge"><img src="img/logo.jpg" alt="SUCOVI" onerror="this.replaceWith(document.createTextNode('SUCOVI'))"></span>
+      <div id="homeTxt"></div>
+    </div>
     <h2 class="htit">¿Qué hacemos?</h2>
     <p class="hsub">Elegí cómo recibir a los invitados.</p>
     <button id="btnHomeQr" class="hcard">
@@ -219,7 +223,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script>
-const VERSION = 'V2.18';
+const VERSION = 'V2.19';
 const API = 'https://script.google.com/macros/s/AKfycbzMpPl3zmXfQaGcZ1IcDG9wnPFv2LqhG8iqaqoqRgOzMpZf4h3qrcD73M2ElsGLJgKM/exec';
 const $ = id => document.getElementById(id);
 $('ver').textContent = 'Happy Fest · ' + VERSION;
