@@ -49,10 +49,9 @@
   #bar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
   #btnHome{flex:none;width:46px;height:46px;padding:0;margin:0;display:grid;place-items:center;border-radius:14px;background:var(--gold);color:var(--navy)}
   #btnHome svg{width:24px;height:24px}
-  #barTxt{flex:1;min-width:0;text-align:center;line-height:1.2}
+  #barTxt{flex:1;min-width:0;text-align:left;line-height:1.2}
   #barTxt b{display:block;color:var(--gold);font-size:1.1rem}
   #barTxt small{display:block;opacity:.7;font-size:.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  #btnSalir{flex:none;width:auto;margin:0;padding:0 16px;height:46px;font-size:.95rem}
 
   #reader{width:100%;border-radius:14px;overflow:hidden;margin-top:10px;min-height:120px;background:#000}
   #rw{position:relative;overflow:hidden;border-radius:14px;margin-top:10px}
@@ -75,6 +74,7 @@
   .info{background:#1E2A5A;border:2px solid var(--gold)}
   #res .dato{font-size:1.3rem;margin-top:2px}
   #res select{margin-top:16px;font-size:1.15rem;text-align-last:center}
+  #res input{margin-top:14px;font-size:1.15rem;text-align:center;letter-spacing:1px}
   .acts{display:flex;gap:8px;margin-top:20px}.acts button{margin:0}
   #btnEntrar{flex:2;background:#fff;color:#15803d;font-size:1.25rem;padding:16px}
   #btnCancel{flex:1;background:rgba(0,0,0,.25);color:#fff}
@@ -139,7 +139,6 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5a1 1 0 0 0 1 1H10v-5.5h4v5.5h3.5a1 1 0 0 0 1-1V10"/></svg>
       </button>
       <span id="barTxt"></span>
-      <button id="btnSalir" class="sec">Salir</button>
     </div>
     <div id="rw"><div id="reader"></div><div id="guide"></div></div>
 
@@ -149,15 +148,15 @@
     </div>
 
     <div id="boxDni" class="hide">
-      <input id="nombre" placeholder="Nombre (obligatorio)">
-      <input id="apellido" placeholder="Apellido">
+      <input id="nombre" placeholder="Nombre y apellido (obligatorio)" autocomplete="off">
       <input id="dni" inputmode="numeric" placeholder="DNI">
+      <input id="telefono" type="tel" inputmode="numeric" pattern="[0-9]*" placeholder="Teléfono (solo números)">
       <select id="medio">
         <option value="">Medio de pago (obligatorio)</option>
         <option value="Efectivo">Efectivo</option>
         <option value="MP Sucovi">MP Sucovi</option>
       </select>
-      <button id="btnVenta">Registrar venta y dejar ingresar</button>
+      <button id="btnVenta">Registrar venta e ingreso</button>
     </div>
   </div>
 
@@ -169,7 +168,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script>
-const VERSION = 'V2.11';
+const VERSION = 'V2.12';
 const API = 'https://script.google.com/macros/s/AKfycbzMpPl3zmXfQaGcZ1IcDG9wnPFv2LqhG8iqaqoqRgOzMpZf4h3qrcD73M2ElsGLJgKM/exec';
 const $ = id => document.getElementById(id);
 $('ver').textContent = 'Happy Fest · ' + VERSION;
@@ -295,24 +294,26 @@ let bloqDni = { dni: '', hasta: 0 }; // evita releer enseguida el mismo DNI que 
 function confirmarVenta(d) {
   busy = true;
   bloqDni.dni = d.dni;
-  const nombreCompleto = (d.nombre + ' ' + d.apellido).trim();
+  const nombreCompleto = (d.nombre + ' ' + d.apellido).trim(); // nombre y apellido van juntos en la columna Nombre
   const el = $('res');
   $('ov').classList.remove('hide');
   el.className = 'info';
   el.innerHTML = '<b>VENTA EN PUERTA</b><small>' + esc(FIESTA) + '</small><div class="nom">' + esc(nombreCompleto) + '</div>' +
     '<div class="dato">DNI: ' + (d.dni ? esc(d.dni) : '—') + '</div>' +
+    '<input id="telV" type="tel" inputmode="numeric" pattern="[0-9]*" placeholder="Teléfono (solo números)">' +
     '<select id="medioV"><option value="">Medio de pago (obligatorio)</option>' +
     MEDIOS.map(m => '<option value="' + esc(m) + '">' + esc(m) + '</option>').join('') + '</select>' +
     '<div id="vErr" class="err"></div>' +
     '<div class="acts"><button id="btnEntrar">Aceptar</button><button id="btnCancel">Cancelar</button></div>';
   $('medioV').addEventListener('change', () => { $('vErr').textContent = ''; });
+  $('telV').addEventListener('input', () => { $('telV').value = $('telV').value.replace(/\D/g, ''); });
   $('btnCancel').onclick = cerrar;
   $('btnEntrar').onclick = async () => {
     const medio = $('medioV').value;
     if (!medio) { $('vErr').textContent = 'Elegí el medio de pago'; return; }
     audio();
     cargando('Registrando venta…', nombreCompleto);
-    await seguro(() => call({ a: 'venta', nombre: d.nombre, apellido: d.apellido, dni: d.dni, medio }));
+    await seguro(() => call({ a: 'venta', nombre: nombreCompleto, apellido: '', dni: d.dni, telefono: $('telV').value.replace(/\D/g, ''), medio }));
   };
 }
 
@@ -378,12 +379,17 @@ async function arrancar() {
   }).catch(e => alert('No se pudo abrir la cámara: ' + e));
 }
 
+function limpiarVenta() {
+  $('nombre').value = $('dni').value = $('telefono').value = '';
+  $('medio').value = '';
+}
+
 function cambiarModo(m) {
   modo = m;
   pendiente = null; busy = false;
   clearTimeout(lentoT);
   $('ov').classList.add('hide');
-  $('nombre').value = $('apellido').value = $('dni').value = ''; $('medio').value = '';
+  limpiarVenta();
   $('barTxt').innerHTML = '<b>' + (m === 'qr' ? 'Ingreso con QR' : 'Venta en puerta') + '</b><small>' + esc(FIESTA) + ' · ' + esc(USR) + '</small>';
   $('rw').classList.toggle('dni', m === 'dni');
   $('boxQr').classList.toggle('hide', m !== 'qr');
@@ -453,7 +459,6 @@ $('usr').addEventListener('focus', () => { if (!usuariosOk) cargarUsuarios(); })
 cargarUsuarios();
 
 $('btnLogin').onclick = login;
-$('btnSalir').onclick = salir;
 $('btnSalir2').onclick = salir;
 $('btnHome').onclick = mostrarHome;
 $('btnHomeQr').onclick = () => entrarA('qr');
@@ -465,21 +470,23 @@ $('usr').addEventListener('change', () => { if ($('usr').value) $('pin').focus()
 $('pin').addEventListener('input', () => { $('pin').value = $('pin').value.replace(/\D/g, '').slice(0, 6); });
 $('pin').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
 $('btnCodigo').onclick = () => { const c = $('codigo').value; if (busy) return; verificar(c); $('codigo').value = ''; };
+$('telefono').addEventListener('input', () => { $('telefono').value = $('telefono').value.replace(/\D/g, ''); });
 $('btnVenta').onclick = () => {
   if (busy) return;
   if (!$('nombre').value.trim()) return alert('Falta el nombre');
   if (!$('medio').value) return alert('Elegí el medio de pago');
   audio();
-  const nom = ($('nombre').value + ' ' + $('apellido').value).trim();
+  const nom = $('nombre').value.trim();
   cargando('Registrando venta…', nom); // también evita el doble toque; se libera al cerrar el cartel
   seguro(() => call({
     a: 'venta',
-    nombre: $('nombre').value,
-    apellido: $('apellido').value,
+    nombre: nom,
+    apellido: '',
     dni: $('dni').value,
+    telefono: $('telefono').value.replace(/\D/g, ''),
     medio: $('medio').value
   })).then(r => {
-    if (r && r.ok) { $('nombre').value = $('apellido').value = $('dni').value = ''; $('medio').value = ''; }
+    if (r && r.ok) limpiarVenta();
   });
 };
 </script>
