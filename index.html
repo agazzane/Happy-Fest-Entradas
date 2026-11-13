@@ -29,21 +29,26 @@
   .err{color:#ffb4b4;text-align:center;min-height:1.3em;margin-top:8px;font-size:.95rem}
 
   /* ---- Menú de inicio ---- */
-  #home{margin-top:6px}
-  #homeTxt{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:0 0 20px}
+  #home{margin-top:6px;display:flex;flex-direction:column;min-height:calc(100vh - 90px);min-height:calc(100dvh - 90px)}
+  .hlogo{text-align:center;margin:4px 0 22px}
+  .hlogo img{max-width:58%;max-height:110px;object-fit:contain;border-radius:14px;display:inline-block}
+  .htit{font-size:2rem;line-height:1.15;margin:22px 0 6px}
+  .hsub{margin:0 0 6px;font-size:.95rem;color:#cbd2f0}
+  #homeTxt{display:flex;justify-content:flex-start;gap:8px;flex-wrap:wrap;margin:0}
   #homeTxt span{background:var(--glass);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:.9rem;font-weight:600;color:var(--gold)}
-  .hcard{display:flex;align-items:center;gap:16px;text-align:left;margin-top:14px;padding:20px 18px;border-radius:20px;
+  .hcard{display:flex;align-items:center;gap:16px;text-align:left;margin-top:16px;padding:22px 18px;border-radius:24px;
          background:linear-gradient(160deg,rgba(255,255,255,.14),rgba(255,255,255,.05));color:#fff;
          border:1px solid var(--line);box-shadow:0 14px 34px rgba(0,0,0,.3)}
   .hcard:active{background:linear-gradient(160deg,rgba(255,255,255,.2),rgba(255,255,255,.08))}
-  .hico{flex:none;width:64px;height:64px;border-radius:18px;background:var(--gold);color:var(--navy);display:grid;place-items:center;
+  .hico{flex:none;width:68px;height:68px;border-radius:20px;background:var(--gold);color:var(--navy);display:grid;place-items:center;
         box-shadow:0 6px 16px rgba(255,209,102,.3)}
   .hico svg{width:34px;height:34px}
   .htxt{flex:1;min-width:0}
   .htxt b{display:block;font-size:1.3rem;line-height:1.2}
   .htxt small{display:block;font-size:.9rem;font-weight:400;opacity:.75;margin-top:4px}
   .hchev{flex:none;width:22px;height:22px;opacity:.55}
-  #btnSalir2{background:transparent;color:#fff;opacity:.7;font-weight:600;margin-top:26px;border:1px solid var(--line)}
+  #btnSalir2{background:transparent;color:#fff;opacity:.7;font-weight:600;margin-top:auto;border:1px solid var(--line)}
+  #btnHomeDni{margin-bottom:26px}
 
   /* ---- Barra superior dentro de cada modo ---- */
   #bar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
@@ -158,7 +163,10 @@
 
   <!-- Menú de inicio: se ve después del login y al tocar la casita -->
   <div id="home" class="hide">
+    <div class="hlogo"><img src="img/logo.jpg" alt="SUCOVI" onerror="this.parentNode.classList.add('hide')"></div>
     <div id="homeTxt"></div>
+    <h2 class="htit">¿Qué hacemos?</h2>
+    <p class="hsub">Elegí cómo recibir a los invitados.</p>
     <button id="btnHomeQr" class="hcard">
       <span class="hico">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><rect x="7" y="7" width="4" height="4" rx=".5"/><rect x="13" y="7" width="4" height="4" rx=".5"/><rect x="7" y="13" width="4" height="4" rx=".5"/><path d="M13 13h1.5M16.5 13H17M13 16.5V17M16.5 15v2"/></svg>
@@ -211,7 +219,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script>
-const VERSION = 'V2.17';
+const VERSION = 'V2.18';
 const API = 'https://script.google.com/macros/s/AKfycbzMpPl3zmXfQaGcZ1IcDG9wnPFv2LqhG8iqaqoqRgOzMpZf4h3qrcD73M2ElsGLJgKM/exec';
 const $ = id => document.getElementById(id);
 $('ver').textContent = 'Happy Fest · ' + VERSION;
@@ -490,7 +498,7 @@ function mostrarHome() {
   clearTimeout(lentoT);
   $('ov').classList.add('hide');
   $('app').classList.add('hide');
-  $('hdr').classList.remove('hide');
+  $('hdr').classList.add('hide'); // el Inicio trae su propio logo
   $('homeTxt').innerHTML = '<span>' + esc(FIESTA) + '</span><span>' + esc(USR) + '</span>';
   $('home').classList.remove('hide');
   $('home').classList.add('fade');
