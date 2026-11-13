@@ -257,7 +257,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script>
-const VERSION = 'V2.24';
+const VERSION = 'V2.25';
 const API = 'https://script.google.com/macros/s/AKfycbzMpPl3zmXfQaGcZ1IcDG9wnPFv2LqhG8iqaqoqRgOzMpZf4h3qrcD73M2ElsGLJgKM/exec';
 const $ = id => document.getElementById(id);
 $('ver').textContent = 'Happy Fest · ' + VERSION;
@@ -532,6 +532,7 @@ function cambiarModo(m) {
 // ---- Menú de inicio ----
 function mostrarHome() {
   if (scanner) { scanner.stop().catch(() => {}); } // apaga la cámara al volver al menú
+  vista = ''; guardarSesion();
   busy = false; pendiente = null;
   clearTimeout(lentoT);
   $('ov').classList.add('hide');
@@ -542,12 +543,13 @@ function mostrarHome() {
   $('home').classList.add('fade');
 }
 function entrarA(m) {
+  vista = m; guardarSesion();
   $('home').classList.add('hide');
   $('hdr').classList.add('hide'); // más lugar para la cámara
   $('app').classList.remove('hide');
   cambiarModo(m);
 }
-const salir = () => { if (confirm('¿Cerrar sesión para cambiar de usuario o de fiesta?')) location.reload(); };
+const salir = () => { if (confirm('¿Cerrar sesión para cambiar de usuario o de fiesta?')) { borrarSesion(); location.reload(); } };
 
 async function login() {
   audio(); // desbloquea el sonido (el celular lo exige tras un toque)
@@ -569,6 +571,7 @@ async function login() {
   } finally { b.disabled = false; b.textContent = 'Ingresar'; b.classList.remove('loading'); }
   $('ver').textContent = 'Happy Fest · ' + VERSION + ' · ' + USR + ' · ' + FIESTA;
   $('login').classList.add('hide');
+  pantallaEncendida();
   mostrarHome();
 }
 
@@ -616,6 +619,45 @@ $('btnVenta').onclick = () => {
   // enviarVenta abre el cartel de carga (evita el doble toque) y limpia el formulario si se registró
   enviarVenta({ nombre: nom, apellido: '', dni: dniV, telefono: telV, medio: medioV });
 };
+
+// ---- Sesión: se recuerda en este celular (14 hs) para no loguearse de nuevo al bloquear y desbloquear ----
+const SES = 'hf_sesion', SES_HORAS = 14;
+let vista = '', wl = null; // vista: '' (menú) | 'qr' | 'dni'; wl: bloqueo para que la pantalla no se apague
+function guardarSesion() { try { localStorage.setItem(SES, JSON.stringify({ usr: USR, pin: PIN, fiesta: FIESTA, vista, t: Date.now() })); } catch (e) {} }
+function borrarSesion() { try { localStorage.removeItem(SES); } catch (e) {} }
+async function pantallaEncendida() {
+  try {
+    if ('wakeLock' in navigator && !wl) {
+      wl = await navigator.wakeLock.request('screen');
+      wl.addEventListener('release', () => { wl = null; });
+    }
+  } catch (e) {}
+}
+async function restaurarSesion() {
+  let s = null;
+  try { s = JSON.parse(localStorage.getItem(SES) || 'null'); } catch (e) {}
+  if (!s || !s.usr || !s.pin || !s.fiesta || Date.now() - s.t > SES_HORAS * 3600000) { borrarSesion(); return; }
+  USR = s.usr; PIN = s.pin; FIESTA = s.fiesta;
+  $('login').classList.add('hide'); // evita que parpadee el login mientras se verifica
+  try {
+    const r = await call({ a: 'stats' });
+    if (!r.ok) { USR = PIN = FIESTA = ''; borrarSesion(); $('login').classList.remove('hide'); return; }
+  } catch (e) {} // sin señal: se entra igual, cada acción se vuelve a validar en el servidor
+  $('ver').textContent = 'Happy Fest · ' + VERSION + ' · ' + USR + ' · ' + FIESTA;
+  pantallaEncendida();
+  if (s.vista) entrarA(s.vista); else mostrarHome();
+}
+// Al desbloquear el celular: vuelve a pedir la pantalla encendida y reinicia la cámara si quedó congelada
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'visible' || !USR) return;
+  pantallaEncendida();
+  if (vista) {
+    const v = document.querySelector('#reader video');
+    const vivo = v && v.srcObject && v.srcObject.active && !v.paused;
+    if (!vivo) arrancar();
+  }
+});
+restaurarSesion();
 </script>
 </body>
 </html>
