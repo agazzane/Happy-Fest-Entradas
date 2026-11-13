@@ -7,7 +7,7 @@
 <style>
   :root{--navy:#1E2A5A;--gold:#FFD166;--ink:#0f1535;--glass:rgba(255,255,255,.08);--line:rgba(255,255,255,.14)}
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,sans-serif;color:#fff;
+  body{margin:0;min-height:100vh;min-height:100dvh;font-family:system-ui,-apple-system,sans-serif;color:#fff;
        background:radial-gradient(circle at 50% -10%,#2c3c83 0%,var(--navy) 40%,var(--ink) 100%) fixed}
   main{max-width:480px;margin:0 auto;padding:18px 14px 28px}
   header{text-align:center;margin:10px 0 18px}
@@ -211,7 +211,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script>
-const VERSION = 'V2.15';
+const VERSION = 'V2.16';
 const API = 'https://script.google.com/macros/s/AKfycbzMpPl3zmXfQaGcZ1IcDG9wnPFv2LqhG8iqaqoqRgOzMpZf4h3qrcD73M2ElsGLJgKM/exec';
 const $ = id => document.getElementById(id);
 $('ver').textContent = 'Happy Fest · ' + VERSION;
@@ -329,10 +329,16 @@ function show(r) {
   if (r.ok && r.estado === 'DNI_REPETIDO' && ventaPend) {
     // Solo avisa: la persona decide si registra igual (ej. un chico con el DNI del padre)
     const params = ventaPend;
-    el.innerHTML = html + '<small class="dato">Podés registrarlo igual si es otra persona.</small>' +
-      '<div class="acts"><button id="btnEntrar">REGISTRAR IGUAL</button><button id="btnCancel">Cancelar</button></div>';
-    $('btnEntrar').onclick = () => { audio(); enviarVenta({ ...params, forzar: '1' }); };
-    $('btnCancel').onclick = cerrar;
+    if (params.forzar) {
+      // Ya se pidió "registrar igual" y el servidor volvió a rechazarlo: no insistir en bucle
+      el.innerHTML = html + '<small class="dato">El servidor sigue rechazando este DNI y la venta NO se registró. Falta actualizar el script de Google.</small>' +
+        '<button id="btnCerrar">Aceptar</button>';
+      $('btnCerrar').onclick = cerrar;
+    } else {
+      el.innerHTML = html + '<div class="acts"><button id="btnEntrar">REGISTRAR IGUAL</button><button id="btnCancel">Cancelar</button></div>';
+      $('btnEntrar').onclick = () => { audio(); enviarVenta({ ...params, forzar: '1' }); };
+      $('btnCancel').onclick = cerrar;
+    }
   } else if (r.ok && r.estado === 'VALIDA' && pendiente) {
     el.innerHTML = html + '<div class="acts"><button id="btnEntrar">DAR INGRESO</button><button id="btnCancel">Cancelar</button></div>';
     $('btnEntrar').onclick = entrar;
