@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Happy Fest - Puerta</title>
 <style>
-  :root{--navy:#1E2A5A;--gold:#FFD166;--ink:#0f1535}
-  *{box-sizing:border-box}
+  :root{--navy:#1E2A5A;--gold:#FFD166;--ink:#0f1535;--glass:rgba(255,255,255,.08);--line:rgba(255,255,255,.14)}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,sans-serif;color:#fff;
        background:radial-gradient(circle at 50% -10%,#2c3c83 0%,var(--navy) 40%,var(--ink) 100%) fixed}
   main{max-width:480px;margin:0 auto;padding:18px 14px 28px}
@@ -17,23 +17,43 @@
   header p{margin:2px 0 0;opacity:.75;font-size:.95rem;letter-spacing:2px;text-transform:uppercase}
   input,select,button{font-size:1.05rem;padding:13px;border-radius:12px;border:0;width:100%;margin-top:8px;font-family:inherit}
   input,select{background:#fff;color:#111}
-  button{background:var(--gold);color:var(--navy);font-weight:700}
+  button{background:var(--gold);color:var(--navy);font-weight:700;cursor:pointer;transition:transform .12s ease,filter .12s ease}
+  button:active{transform:scale(.97)}
   button:disabled{opacity:.6}
   button.sec{background:rgba(255,255,255,.14);color:#fff}
-  .card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:20px 16px;margin-top:26px;
+  .card{background:var(--glass);border:1px solid var(--line);border-radius:18px;padding:20px 16px;margin-top:26px;
         box-shadow:0 10px 30px rgba(0,0,0,.25)}
   .card label{display:block;font-size:.85rem;opacity:.8;margin-bottom:2px}
   .card input{text-align:center;font-size:1.3rem;letter-spacing:4px}
   #usr,#fiesta{font-size:1.15rem;text-align-last:center}
-  #bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
-  #barTxt{font-weight:700;color:var(--gold);font-size:1.1rem}
-  #btnSalir{width:auto;margin:0;padding:8px 16px;font-size:.95rem}
   .err{color:#ffb4b4;text-align:center;min-height:1.3em;margin-top:8px;font-size:.95rem}
-  .switch{position:relative;display:flex;background:rgba(255,255,255,.14);border-radius:999px;padding:4px}
-  .switch .thumb{position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);background:var(--gold);border-radius:999px;transition:transform .25s ease}
-  .switch[data-modo="dni"] .thumb{transform:translateX(100%)}
-  .switch button{position:relative;z-index:1;flex:1;margin:0;background:transparent;color:#fff;border-radius:999px;font-size:.95rem;padding:12px 6px;transition:color .25s}
-  .switch button.on{color:var(--navy)}
+
+  /* ---- Menú de inicio ---- */
+  #home{margin-top:6px}
+  #homeTxt{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:0 0 20px}
+  #homeTxt span{background:var(--glass);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:.9rem;font-weight:600;color:var(--gold)}
+  .hcard{display:flex;align-items:center;gap:16px;text-align:left;margin-top:14px;padding:20px 18px;border-radius:20px;
+         background:linear-gradient(160deg,rgba(255,255,255,.14),rgba(255,255,255,.05));color:#fff;
+         border:1px solid var(--line);box-shadow:0 14px 34px rgba(0,0,0,.3)}
+  .hcard:active{background:linear-gradient(160deg,rgba(255,255,255,.2),rgba(255,255,255,.08))}
+  .hico{flex:none;width:64px;height:64px;border-radius:18px;background:var(--gold);color:var(--navy);display:grid;place-items:center;
+        box-shadow:0 6px 16px rgba(255,209,102,.3)}
+  .hico svg{width:34px;height:34px}
+  .htxt{flex:1;min-width:0}
+  .htxt b{display:block;font-size:1.3rem;line-height:1.2}
+  .htxt small{display:block;font-size:.9rem;font-weight:400;opacity:.75;margin-top:4px}
+  .hchev{flex:none;width:22px;height:22px;opacity:.55}
+  #btnSalir2{background:transparent;color:#fff;opacity:.7;font-weight:600;margin-top:26px;border:1px solid var(--line)}
+
+  /* ---- Barra superior dentro de cada modo ---- */
+  #bar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  #btnHome{flex:none;width:46px;height:46px;padding:0;margin:0;display:grid;place-items:center;border-radius:14px;background:var(--gold);color:var(--navy)}
+  #btnHome svg{width:24px;height:24px}
+  #barTxt{flex:1;min-width:0;text-align:center;line-height:1.2}
+  #barTxt b{display:block;color:var(--gold);font-size:1.1rem}
+  #barTxt small{display:block;opacity:.7;font-size:.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #btnSalir{flex:none;width:auto;margin:0;padding:0 16px;height:46px;font-size:.95rem}
+
   #reader{width:100%;border-radius:14px;overflow:hidden;margin-top:10px;min-height:120px;background:#000}
   #rw{position:relative;overflow:hidden;border-radius:14px;margin-top:10px}
   #rw #reader{margin-top:0}
@@ -68,7 +88,10 @@
   #res .lento{display:block;opacity:.8;min-height:1.3em}
 
   footer{text-align:center;opacity:.45;font-size:.75rem;margin-top:22px}
-  .hide{display:none}
+  .hide{display:none!important}
+  .fade{animation:entra .28s ease}
+  @keyframes entra{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){.fade,.spin{animation-duration:.01s}button{transition:none}}
 </style>
 </head>
 <body>
@@ -90,12 +113,33 @@
     <button id="btnLogin">Ingresar</button>
   </section>
 
+  <!-- Menú de inicio: se ve después del login y al tocar la casita -->
+  <div id="home" class="hide">
+    <div id="homeTxt"></div>
+    <button id="btnHomeQr" class="hcard">
+      <span class="hico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><rect x="7" y="7" width="4" height="4" rx=".5"/><rect x="13" y="7" width="4" height="4" rx=".5"/><rect x="7" y="13" width="4" height="4" rx=".5"/><path d="M13 13h1.5M16.5 13H17M13 16.5V17M16.5 15v2"/></svg>
+      </span>
+      <span class="htxt"><b>Ingreso con QR</b><small>Escanear entradas</small></span>
+      <svg class="hchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+    </button>
+    <button id="btnHomeDni" class="hcard">
+      <span class="hico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><circle cx="8.5" cy="11" r="2"/><path d="M5.5 16c.6-1.6 1.7-2.4 3-2.4s2.4.8 3 2.4M14 10h4.5M14 13.5h3"/></svg>
+      </span>
+      <span class="htxt"><b>Venta en puerta</b><small>Escanear DNI y cobrar</small></span>
+      <svg class="hchev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+    </button>
+    <button id="btnSalir2">Cerrar sesión</button>
+  </div>
+
   <div id="app" class="hide">
-    <div id="bar"><span id="barTxt"></span><button id="btnSalir" class="sec">Salir</button></div>
-    <div class="switch" id="sw" data-modo="qr">
-      <div class="thumb"></div>
-      <button id="tabQr" class="on">Escanear (QR)</button>
-      <button id="tabDni">Venta en puerta (DNI)</button>
+    <div id="bar">
+      <button id="btnHome" class="sec" aria-label="Volver al menú" title="Volver al menú">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5a1 1 0 0 0 1 1H10v-5.5h4v5.5h3.5a1 1 0 0 0 1-1V10"/></svg>
+      </button>
+      <span id="barTxt"></span>
+      <button id="btnSalir" class="sec">Salir</button>
     </div>
     <div id="rw"><div id="reader"></div><div id="guide"></div></div>
 
@@ -125,7 +169,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script>
-const VERSION = 'V2.10';
+const VERSION = 'V2.11';
 const API = 'https://script.google.com/macros/s/AKfycbzMpPl3zmXfQaGcZ1IcDG9wnPFv2LqhG8iqaqoqRgOzMpZf4h3qrcD73M2ElsGLJgKM/exec';
 const $ = id => document.getElementById(id);
 $('ver').textContent = 'Happy Fest · ' + VERSION;
@@ -340,14 +384,32 @@ function cambiarModo(m) {
   clearTimeout(lentoT);
   $('ov').classList.add('hide');
   $('nombre').value = $('apellido').value = $('dni').value = ''; $('medio').value = '';
-  $('tabQr').className = m === 'qr' ? 'on' : '';
-  $('tabDni').className = m === 'dni' ? 'on' : '';
-  $('sw').dataset.modo = m;
+  $('barTxt').innerHTML = '<b>' + (m === 'qr' ? 'Ingreso con QR' : 'Venta en puerta') + '</b><small>' + esc(FIESTA) + ' · ' + esc(USR) + '</small>';
   $('rw').classList.toggle('dni', m === 'dni');
   $('boxQr').classList.toggle('hide', m !== 'qr');
   $('boxDni').classList.toggle('hide', m !== 'dni');
   arrancar();
 }
+
+// ---- Menú de inicio ----
+function mostrarHome() {
+  if (scanner) { scanner.stop().catch(() => {}); } // apaga la cámara al volver al menú
+  busy = false; pendiente = null;
+  clearTimeout(lentoT);
+  $('ov').classList.add('hide');
+  $('app').classList.add('hide');
+  $('hdr').classList.remove('hide');
+  $('homeTxt').innerHTML = '<span>' + esc(FIESTA) + '</span><span>' + esc(USR) + '</span>';
+  $('home').classList.remove('hide');
+  $('home').classList.add('fade');
+}
+function entrarA(m) {
+  $('home').classList.add('hide');
+  $('hdr').classList.add('hide'); // más lugar para la cámara
+  $('app').classList.remove('hide');
+  cambiarModo(m);
+}
+const salir = () => { if (confirm('¿Cerrar sesión para cambiar de usuario o de fiesta?')) location.reload(); };
 
 async function login() {
   audio(); // desbloquea el sonido (el celular lo exige tras un toque)
@@ -368,11 +430,8 @@ async function login() {
     return;
   } finally { b.disabled = false; b.textContent = 'Ingresar'; }
   $('ver').textContent = 'Happy Fest · ' + VERSION + ' · ' + USR + ' · ' + FIESTA;
-  $('barTxt').textContent = FIESTA + ' · ' + USR;
-  $('hdr').classList.add('hide');
   $('login').classList.add('hide');
-  $('app').classList.remove('hide');
-  arrancar();
+  mostrarHome();
 }
 
 let usuariosOk = false;
@@ -394,15 +453,17 @@ $('usr').addEventListener('focus', () => { if (!usuariosOk) cargarUsuarios(); })
 cargarUsuarios();
 
 $('btnLogin').onclick = login;
-$('btnSalir').onclick = () => { if (confirm('¿Cerrar sesión para cambiar de usuario o de fiesta?')) location.reload(); };
+$('btnSalir').onclick = salir;
+$('btnSalir2').onclick = salir;
+$('btnHome').onclick = mostrarHome;
+$('btnHomeQr').onclick = () => entrarA('qr');
+$('btnHomeDni').onclick = () => entrarA('dni');
 $('usr').addEventListener('keydown', e => { if (e.key === 'Enter') $('pin').focus(); });
 // Al elegir el usuario, pasa directo a la contraseña y abre el teclado numérico
 $('usr').addEventListener('change', () => { if ($('usr').value) $('pin').focus(); });
 // Solo números en la contraseña
 $('pin').addEventListener('input', () => { $('pin').value = $('pin').value.replace(/\D/g, '').slice(0, 6); });
 $('pin').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
-$('tabQr').onclick = () => cambiarModo('qr');
-$('tabDni').onclick = () => cambiarModo('dni');
 $('btnCodigo').onclick = () => { const c = $('codigo').value; if (busy) return; verificar(c); $('codigo').value = ''; };
 $('btnVenta').onclick = () => {
   if (busy) return;
