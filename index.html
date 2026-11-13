@@ -58,6 +58,11 @@
     -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4'/%3E%3Cpath d='M9 8l4 4-4 4M13 12H4'/%3E%3C/svg%3E") center/contain no-repeat;
     mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4'/%3E%3Cpath d='M9 8l4 4-4 4M13 12H4'/%3E%3C/svg%3E") center/contain no-repeat}
   #btnLogin:disabled::after{display:none}
+  #btnLogin{position:relative;overflow:hidden;isolation:isolate}
+  #btnLogin:disabled{opacity:1}
+  #btnLogin::before{content:"";position:absolute;z-index:-1;left:0;top:0;bottom:0;width:0;background:rgba(106,168,255,.7)}
+  #btnLogin.loading::before{animation:llena 2.4s cubic-bezier(.3,.6,.3,1) forwards}
+  @keyframes llena{to{width:94%}}
 
   /* ---- Menú de inicio ---- */
   #home{margin-top:6px;display:flex;flex-direction:column;min-height:calc(100vh - 90px);min-height:calc(100dvh - 90px)}
@@ -252,7 +257,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script>
-const VERSION = 'V2.22';
+const VERSION = 'V2.24';
 const API = 'https://script.google.com/macros/s/AKfycbzMpPl3zmXfQaGcZ1IcDG9wnPFv2LqhG8iqaqoqRgOzMpZf4h3qrcD73M2ElsGLJgKM/exec';
 const $ = id => document.getElementById(id);
 $('ver').textContent = 'Happy Fest · ' + VERSION;
@@ -554,14 +559,14 @@ async function login() {
   if (!FIESTA) { err.textContent = 'Elegí la fiesta'; return; }
   if (!USR || !PIN) { err.textContent = 'Elegí tu usuario y escribí la contraseña'; return; }
   if (!/^\d{4,6}$/.test(PIN)) { err.textContent = 'La contraseña tiene entre 4 y 6 números'; return; }
-  b.disabled = true; b.textContent = 'Verificando…';
+  b.disabled = true; b.textContent = 'Verificando…'; b.classList.add('loading');
   try {
     const r = await call({ a: 'stats' });
     if (!r.ok) { err.textContent = 'Usuario o contraseña incorrectos'; return; }
   } catch (e) {
     err.textContent = 'No se pudo conectar: ' + (e && e.message ? e.message : e) + ' (' + TAG() + ')';
     return;
-  } finally { b.disabled = false; b.textContent = 'Ingresar'; }
+  } finally { b.disabled = false; b.textContent = 'Ingresar'; b.classList.remove('loading'); }
   $('ver').textContent = 'Happy Fest · ' + VERSION + ' · ' + USR + ' · ' + FIESTA;
   $('login').classList.add('hide');
   mostrarHome();
