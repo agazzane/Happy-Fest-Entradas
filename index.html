@@ -60,6 +60,13 @@
   #btnCancel{flex:1;background:rgba(0,0,0,.25);color:#fff}
   #btnCerrar{background:#fff;color:var(--navy);font-size:1.25rem;padding:16px;margin-top:20px}
 
+  /* Cartel "cargando": spinner + texto mientras se consulta la planilla */
+  .spin{width:60px;height:60px;margin:6px auto 18px;border:6px solid rgba(255,255,255,.22);border-top-color:var(--gold);
+        border-radius:50%;animation:girar .8s linear infinite}
+  @keyframes girar{to{transform:rotate(360deg)}}
+  #res .cod{font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:3px;color:var(--gold);margin:2px 0 10px}
+  #res .lento{display:block;opacity:.8;min-height:1.3em}
+
   footer{text-align:center;opacity:.45;font-size:.75rem;margin-top:22px}
   .hide{display:none}
 </style>
@@ -118,13 +125,13 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script>
-const VERSION = 'V2.9';
+const VERSION = 'V2.10';
 const API = 'https://script.google.com/macros/s/AKfycbzMpPl3zmXfQaGcZ1IcDG9wnPFv2LqhG8iqaqoqRgOzMpZf4h3qrcD73M2ElsGLJgKM/exec';
 const $ = id => document.getElementById(id);
 $('ver').textContent = 'Happy Fest · ' + VERSION;
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 // busy = true mientras hay un cartel abierto o una consulta en curso: no se acepta ningún escaneo nuevo.
-let USR = '', PIN = '', FIESTA = '', busy = false, scanner = null, modo = 'qr', pendiente = null;
+let USR = '', PIN = '', FIESTA = '', busy = false, scanner = null, modo = 'qr', pendiente = null, lentoT = null;
 const TAG = () => VERSION + ' · …' + API.slice(-12);
 
 // OJO: el parámetro del código se llama "x" (con "c" Google rechaza el pedido).
@@ -176,10 +183,30 @@ const SONIDOS = {
   5: () => { tono(1568, 0, 0.9, 'sine', 0.22); tono(2349, 0, 0.6, 'sine', 0.1); tono(3136, 0, 0.4, 'sine', 0.05); }
 };
 function sonarOk() { if (!audio()) return; try { SONIDOS[SONIDO](); } catch (e) {} }
+// Bip cortito de "ya leí el código" (distinto del sonido de ingreso OK)
+function sonarLeido() { if (!audio()) return; try { tono(1000, 0, 0.07, 'sine', 0.12); } catch (e) {} }
+
+// Cartel de "cargando": se abre apenas se lee el código y se reemplaza cuando llega la respuesta.
+function cargando(titulo, detalle) {
+  busy = true;
+  clearTimeout(lentoT);
+  $('ov').classList.remove('hide');
+  const el = $('res');
+  el.className = 'info';
+  el.innerHTML = '<div class="spin"></div><b>' + esc(titulo) + '</b>' +
+    (detalle ? '<div class="dato cod">' + esc(detalle) + '</div>' : '') +
+    '<small class="lento" id="lento">Un momento…</small>';
+  // Si tarda mucho, avisa que sigue trabajando (conexión lenta)
+  lentoT = setTimeout(() => {
+    const s = $('lento');
+    if (s) s.textContent = 'Sigue buscando… la conexión está lenta';
+  }, 8000);
+}
 
 // Muestra el cartel. Queda abierto hasta que la persona toque un botón.
 function show(r) {
   busy = true;
+  clearTimeout(lentoT);
   const el = $('res');
   $('ov').classList.remove('hide');
   let cls, html;
@@ -210,6 +237,7 @@ function show(r) {
 // Cierra el cartel y vuelve a habilitar el escaneo.
 function cerrar() {
   pendiente = null;
+  clearTimeout(lentoT);
   bloqDni.hasta = Date.now() + 4000;
   $('ov').classList.add('hide');
   $('res').innerHTML = '';
@@ -239,8 +267,7 @@ function confirmarVenta(d) {
     const medio = $('medioV').value;
     if (!medio) { $('vErr').textContent = 'Elegí el medio de pago'; return; }
     audio();
-    $('btnEntrar').disabled = true; $('btnEntrar').textContent = 'Registrando…';
-    $('btnCancel').disabled = true;
+    cargando('Registrando venta…', nombreCompleto);
     await seguro(() => call({ a: 'venta', nombre: d.nombre, apellido: d.apellido, dni: d.dni, medio }));
   };
 }
@@ -255,9 +282,12 @@ async function seguro(fn) {
 
 async function verificar(code) {
   if (busy || !code) return;
-  busy = true;
   code = code.trim();
   pendiente = null;
+  // Feedback inmediato: ya leyó el código y está buscando en la planilla
+  cargando('Verificando entrada…', code);
+  navigator.vibrate && navigator.vibrate(60);
+  sonarLeido();
   // Primero solo consulta: NO marca el ingreso. Si es válida, el cartel trae DAR INGRESO / Cancelar.
   await seguro(async () => {
     const r = await call({ a: 'check', x: code });
@@ -268,9 +298,8 @@ async function verificar(code) {
 
 async function entrar() {
   audio();
-  const b = $('btnEntrar');
-  b.disabled = true; b.textContent = 'Registrando…';
   const code = pendiente;
+  cargando('Registrando ingreso…', code);
   await seguro(() => call({ a: 'ingresar', x: code }));
   pendiente = null; // el cartel nuevo (con datos del ingreso) queda hasta que toquen Aceptar
 }
@@ -308,6 +337,7 @@ async function arrancar() {
 function cambiarModo(m) {
   modo = m;
   pendiente = null; busy = false;
+  clearTimeout(lentoT);
   $('ov').classList.add('hide');
   $('nombre').value = $('apellido').value = $('dni').value = ''; $('medio').value = '';
   $('tabQr').className = m === 'qr' ? 'on' : '';
@@ -379,7 +409,8 @@ $('btnVenta').onclick = () => {
   if (!$('nombre').value.trim()) return alert('Falta el nombre');
   if (!$('medio').value) return alert('Elegí el medio de pago');
   audio();
-  busy = true; // evita doble toque; se libera al cerrar el cartel
+  const nom = ($('nombre').value + ' ' + $('apellido').value).trim();
+  cargando('Registrando venta…', nom); // también evita el doble toque; se libera al cerrar el cartel
   seguro(() => call({
     a: 'venta',
     nombre: $('nombre').value,
