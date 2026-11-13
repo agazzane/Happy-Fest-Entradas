@@ -168,13 +168,13 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script>
-const VERSION = 'V2.13';
+const VERSION = 'V2.14';
 const API = 'https://script.google.com/macros/s/AKfycbzMpPl3zmXfQaGcZ1IcDG9wnPFv2LqhG8iqaqoqRgOzMpZf4h3qrcD73M2ElsGLJgKM/exec';
 const $ = id => document.getElementById(id);
 $('ver').textContent = 'Happy Fest · ' + VERSION;
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 // busy = true mientras hay un cartel abierto o una consulta en curso: no se acepta ningún escaneo nuevo.
-let USR = '', PIN = '', FIESTA = '', busy = false, scanner = null, modo = 'qr', pendiente = null, lentoT = null;
+let USR = '', PIN = '', FIESTA = '', busy = false, scanner = null, modo = 'qr', pendiente = null, lentoT = null, ventaPend = null;
 const TAG = () => VERSION + ' · …' + API.slice(-12);
 
 // OJO: el parámetro del código se llama "x" (con "c" Google rechaza el pedido).
@@ -265,7 +265,14 @@ function show(r) {
       (r.hora ? '<br><small>Hora de ingreso: ' + esc(r.hora) + '</small>' : '');
   }
   el.className = cls;
-  if (r.ok && r.estado === 'VALIDA' && pendiente) {
+  if (r.ok && r.estado === 'DNI_REPETIDO' && ventaPend) {
+    // Solo avisa: la persona decide si registra igual (ej. un chico con el DNI del padre)
+    const params = ventaPend;
+    el.innerHTML = html + '<small class="dato">Podés registrarlo igual si es otra persona.</small>' +
+      '<div class="acts"><button id="btnEntrar">REGISTRAR IGUAL</button><button id="btnCancel">Cancelar</button></div>';
+    $('btnEntrar').onclick = () => { audio(); enviarVenta({ ...params, forzar: '1' }); };
+    $('btnCancel').onclick = cerrar;
+  } else if (r.ok && r.estado === 'VALIDA' && pendiente) {
     el.innerHTML = html + '<div class="acts"><button id="btnEntrar">DAR INGRESO</button><button id="btnCancel">Cancelar</button></div>';
     $('btnEntrar').onclick = entrar;
     $('btnCancel').onclick = cerrar;
@@ -279,13 +286,21 @@ function show(r) {
 
 // Cierra el cartel y vuelve a habilitar el escaneo.
 function cerrar() {
-  pendiente = null;
+  pendiente = null; ventaPend = null;
   clearTimeout(lentoT);
   bloqDni.hasta = Date.now() + 4000;
   $('ov').classList.add('hide');
   $('res').innerHTML = '';
   // pequeña pausa para que no relea el mismo código que sigue frente a la cámara
   setTimeout(() => busy = false, 800);
+}
+
+// Envía una venta. Si el DNI ya estaba, el cartel avisa y deja elegir "Registrar igual" (reenvía con forzar=1).
+async function enviarVenta(params) {
+  ventaPend = params;
+  cargando('Registrando venta…', params.nombre);
+  const r = await seguro(() => call({ a: 'venta', ...params }));
+  if (r && r.ok && r.estado === 'VENTA_OK') { ventaPend = null; limpiarVenta(); }
 }
 
 // ---- Venta en puerta con DNI escaneado: pantalla de confirmación ----
@@ -315,8 +330,7 @@ function confirmarVenta(d) {
     // el contenido del cartel y destruye los campos (telV, medioV).
     const telefono = $('telV').value.replace(/\D/g, '');
     audio();
-    cargando('Registrando venta…', nombreCompleto);
-    await seguro(() => call({ a: 'venta', nombre: nombreCompleto, apellido: '', dni: d.dni, telefono, medio }));
+    await enviarVenta({ nombre: nombreCompleto, apellido: '', dni: d.dni, telefono, medio });
   };
 }
 
@@ -484,17 +498,8 @@ $('btnVenta').onclick = () => {
   const dniV = $('dni').value;
   const telV = $('telefono').value.replace(/\D/g, '');
   const medioV = $('medio').value;
-  cargando('Registrando venta…', nom); // también evita el doble toque; se libera al cerrar el cartel
-  seguro(() => call({
-    a: 'venta',
-    nombre: nom,
-    apellido: '',
-    dni: dniV,
-    telefono: telV,
-    medio: medioV
-  })).then(r => {
-    if (r && r.ok) limpiarVenta();
-  });
+  // enviarVenta abre el cartel de carga (evita el doble toque) y limpia el formulario si se registró
+  enviarVenta({ nombre: nom, apellido: '', dni: dniV, telefono: telV, medio: medioV });
 };
 </script>
 </body>
