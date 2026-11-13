@@ -7,26 +7,57 @@
 <style>
   :root{--navy:#1E2A5A;--gold:#FFD166;--ink:#0f1535;--glass:rgba(255,255,255,.08);--line:rgba(255,255,255,.14)}
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{background:#061036}
   body{margin:0;min-height:100vh;min-height:100dvh;font-family:system-ui,-apple-system,sans-serif;color:#fff;
-       background:radial-gradient(circle at 50% -10%,#2c3c83 0%,var(--navy) 40%,var(--ink) 100%) fixed}
-  main{max-width:480px;margin:0 auto;padding:18px 14px 28px}
-  header{text-align:center;margin:10px 0 18px}
+       background:radial-gradient(circle at 12% 22%,rgba(30,90,200,.5),transparent 42%),
+                  radial-gradient(circle at 92% 72%,rgba(30,100,220,.45),transparent 46%),
+                  linear-gradient(180deg,#0b1d62,#061036) fixed}
+  body::before,body::after{content:"";position:fixed;pointer-events:none;z-index:0;border-radius:50%}
+  body::before{width:420px;height:200px;right:-210px;top:38%;border-top:2px solid rgba(110,175,255,.4);transform:rotate(-24deg)}
+  body::after{width:360px;height:180px;left:-120px;bottom:6%;border-bottom:2px solid rgba(110,175,255,.3);transform:rotate(-14deg)}
+  main{position:relative;z-index:1;max-width:480px;margin:0 auto;padding:18px 14px 28px}
+  header{position:relative;text-align:center;margin:10px 0 18px}
+  header::before,header::after{content:"";position:absolute;opacity:.8;clip-path:polygon(50% 0,60% 40%,100% 50%,60% 60%,50% 100%,40% 60%,0 50%,40% 40%)}
+  header::before{left:4%;top:60%;width:18px;height:18px;background:#6aa8ff}
+  header::after{right:2%;top:22%;width:16px;height:16px;background:var(--gold)}
   .logo{font-size:2.6rem;line-height:1}
-  .logo img{max-width:62%;max-height:150px;object-fit:contain;border-radius:14px;display:inline-block}
-  header h1{font-size:1.7rem;margin:6px 0 0;letter-spacing:.5px;color:var(--gold)}
-  header p{margin:10px 0 0;font-size:1.2rem;font-weight:600;color:var(--gold);letter-spacing:2px;text-transform:uppercase}
+  .logo img{display:inline-block;width:62%;max-width:62%;height:auto;padding:3px;border-radius:22px;
+            background:linear-gradient(135deg,#ffd166,#6aa8ff 50%,#ffd166);
+            box-shadow:0 0 34px rgba(90,150,255,.4),0 12px 30px rgba(0,0,0,.45)}
+  header p{margin:18px 0 0;font-size:1.55rem;font-weight:800;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;
+           text-shadow:0 2px 12px rgba(255,209,102,.3)}
   input,select,button{font-size:1.05rem;padding:13px;border-radius:12px;border:0;width:100%;margin-top:8px;font-family:inherit}
   input,select{background:#fff;color:#111}
   button{background:var(--gold);color:var(--navy);font-weight:700;cursor:pointer;transition:transform .12s ease,filter .12s ease}
   button:active{transform:scale(.97)}
   button:disabled{opacity:.6}
   button.sec{background:rgba(255,255,255,.14);color:#fff}
-  .card{background:var(--glass);border:1px solid var(--line);border-radius:18px;padding:20px 16px;margin-top:26px;
-        box-shadow:0 10px 30px rgba(0,0,0,.25)}
-  .card label{display:block;font-size:.85rem;opacity:.8;margin-bottom:2px}
-  .card input{text-align:center;font-size:1.3rem;letter-spacing:4px}
-  #usr,#fiesta{font-size:1.15rem;text-align-last:center}
+
+  /* ---- Login: tarjeta con borde degradado, campos claros con ícono ---- */
+  .card{margin-top:20px;padding:20px 18px 22px;border-radius:26px;border:1.5px solid transparent;
+        background:linear-gradient(160deg,#112270,#0a1648) padding-box,linear-gradient(160deg,#6aa8ff,rgba(255,209,102,.95)) border-box;
+        box-shadow:0 18px 40px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.12)}
+  .card label{display:block;font-size:.95rem;color:#cfd8ff;margin:16px 0 6px}
+  .card label:first-child{margin-top:0}
+  #login select,#login input{padding:15px 44px 15px 48px;border-radius:14px;border:1px solid rgba(120,170,255,.7);
+        background-color:#e9f1ff;color:#1b2a5c;font-size:1.1rem;text-align:left;text-align-last:left;
+        -webkit-appearance:none;appearance:none;background-repeat:no-repeat;background-position:14px center,right 14px center;background-size:22px,20px}
+  #login #fiesta{background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233d5a9a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3.5' y='5' width='17' height='15' rx='2.5'/%3E%3Cpath d='M8 3v4M16 3v4M3.5 10h17M9 15l2 2 4-4'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233d5a9a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")}
+  #login #usr{background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233d5a9a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4.5 20c.8-4 3.8-5.5 7.5-5.5s6.7 1.5 7.5 5.5'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233d5a9a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")}
+  #login #pin{padding-right:14px;letter-spacing:4px;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233d5a9a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5' y='11' width='14' height='9.5' rx='2.5'/%3E%3Cpath d='M8 11V8a4 4 0 0 1 8 0v3'/%3E%3C/svg%3E")}
+  #login select:focus-visible,#login input:focus-visible,#btnLogin:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
   .err{color:#ffb4b4;text-align:center;min-height:1.3em;margin-top:8px;font-size:.95rem}
+  #btnLogin{display:flex;align-items:center;justify-content:center;gap:10px;padding:16px;border-radius:14px;font-size:1.2rem;font-weight:800;
+            background:linear-gradient(#ffd96e,#f7b93a);box-shadow:0 0 26px rgba(255,209,102,.35),0 8px 18px rgba(0,0,0,.35)}
+  #btnLogin::after{content:"";width:22px;height:22px;background:currentColor;
+    -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4'/%3E%3Cpath d='M9 8l4 4-4 4M13 12H4'/%3E%3C/svg%3E") center/contain no-repeat;
+    mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4'/%3E%3Cpath d='M9 8l4 4-4 4M13 12H4'/%3E%3C/svg%3E") center/contain no-repeat}
+  #btnLogin:disabled::after{display:none}
 
   /* ---- Menú de inicio ---- */
   #home{margin-top:6px;display:flex;flex-direction:column;min-height:calc(100vh - 90px);min-height:calc(100dvh - 90px)}
@@ -110,7 +141,6 @@
   #btnCancel{flex:1;background:rgba(0,0,0,.25);color:#fff}
   #btnCerrar{background:#fff;color:var(--navy);font-size:1.25rem;padding:16px;margin-top:20px}
 
-  /* Cartel "cargando": spinner + texto mientras se consulta la planilla */
   /* Cargando: arco que gira alrededor de una entrada que late */
   .ldr{position:relative;width:96px;height:96px;margin:4px auto 16px}
   .ldr svg.anillo{position:absolute;inset:0;width:100%;height:100%;fill:none;stroke-width:5;stroke-linecap:round}
@@ -137,7 +167,7 @@
   #res .cod{font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:3px;color:var(--gold);margin:2px 0 10px}
   #res .lento{display:block;opacity:.8;min-height:1.3em}
 
-  footer{text-align:center;opacity:.45;font-size:.75rem;margin-top:22px}
+  footer{text-align:center;opacity:.5;font-size:.75rem;margin-top:22px}
   .hide{display:none!important}
   .fade{animation:entra .28s ease}
   @keyframes entra{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
@@ -154,9 +184,9 @@
   <section id="login" class="card">
     <label for="fiesta">Fiesta</label>
     <select id="fiesta"><option value="">Elegí la fiesta</option><option>Fiesta 1</option><option>Fiesta 2</option></select>
-    <label for="usr" style="margin-top:12px">Usuario</label>
+    <label for="usr">Usuario</label>
     <select id="usr"><option value="">Cargando usuarios…</option></select>
-    <label for="pin" style="margin-top:12px">Contraseña</label>
+    <label for="pin">Contraseña</label>
     <input id="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="••••" autocomplete="current-password">
     <div id="loginErr" class="err"></div>
     <button id="btnLogin">Ingresar</button>
@@ -222,7 +252,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script>
-const VERSION = 'V2.21';
+const VERSION = 'V2.22';
 const API = 'https://script.google.com/macros/s/AKfycbzMpPl3zmXfQaGcZ1IcDG9wnPFv2LqhG8iqaqoqRgOzMpZf4h3qrcD73M2ElsGLJgKM/exec';
 const $ = id => document.getElementById(id);
 $('ver').textContent = 'Happy Fest · ' + VERSION;
