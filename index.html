@@ -145,6 +145,10 @@
   #btnEntrar{flex:2;background:#fff;color:#15803d;font-size:1.25rem;padding:16px}
   #btnCancel{flex:1;background:rgba(0,0,0,.25);color:#fff}
   #btnCerrar{background:#fff;color:var(--navy);font-size:1.25rem;padding:16px;margin-top:20px}
+  .acts .b1{flex:2;background:#fff;color:var(--navy);font-size:1.15rem;padding:16px}
+  .acts .b2{flex:1;background:rgba(0,0,0,.25);color:#fff}
+  .raw{margin-top:10px;font-size:.85rem;opacity:.85}.raw summary{cursor:pointer}
+  .rawt{margin-top:8px;padding:8px;border-radius:10px;background:rgba(0,0,0,.25);font:.75rem/1.3 ui-monospace,Menlo,Consolas,monospace;text-align:left;word-break:break-all;max-height:110px;overflow:auto;-webkit-user-select:text;user-select:text}
 
   /* Cargando: arco que gira alrededor de una entrada que late */
   .ldr{position:relative;width:96px;height:96px;margin:4px auto 16px}
@@ -257,7 +261,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script>
-const VERSION = 'V2.25';
+const VERSION = 'V2.27';
 const API = 'https://script.google.com/macros/s/AKfycbzMpPl3zmXfQaGcZ1IcDG9wnPFv2LqhG8iqaqoqRgOzMpZf4h3qrcD73M2ElsGLJgKM/exec';
 const $ = id => document.getElementById(id);
 $('ver').textContent = 'Happy Fest · ' + VERSION;
@@ -428,6 +432,7 @@ function confirmarVenta(d) {
   el.className = 'info in';
   el.innerHTML = '<b>VENTA EN PUERTA</b><small>' + esc(FIESTA) + '</small><div class="nom">' + esc(nombreCompleto) + '</div>' +
     '<div class="dato">DNI: ' + (d.dni ? esc(d.dni) : '—') + '</div>' +
+    '<details class="raw"><summary>Ver texto leído</summary><div class="rawt">' + esc(d.raw) + '</div></details>' +
     '<input id="telV" type="tel" inputmode="numeric" pattern="[0-9]*" placeholder="Teléfono (solo números)">' +
     '<select id="medioV"><option value="">Medio de pago (obligatorio)</option>' +
     MEDIOS.map(m => '<option value="' + esc(m) + '">' + esc(m) + '</option>').join('') + '</select>' +
@@ -480,13 +485,47 @@ async function entrar() {
   pendiente = null; // el cartel nuevo (con datos del ingreso) queda hasta que toquen Aceptar
 }
 
-/* DNI argentino (PDF417): NRO_TRAMITE@APELLIDO@NOMBRE@SEXO@DNI@EJEMPLAR@NACIMIENTO@EMISION... */
+/* DNI argentino (PDF417). Formatos conocidos, todos separados por "@":
+   2012:     TRAMITE@APELLIDO@NOMBRE@SEXO@DNI@EJEMPLAR@NACIMIENTO@EMISION@...
+   2024:     TRAMITE@APELLIDO@NOMBRE@DNI@EJEMPLAR@NACIMIENTO@VENCIMIENTO@TOKEN   (sin sexo)
+   anterior: @DNI@EJEMPLAR@TIPO@APELLIDO@NOMBRE@NACIONALIDAD@NACIMIENTO@SEXO@EMISION@TRAMITE@OFICINA@VENCIMIENTO@...
+             (arranca con "@", 16 o 17 campos). Según una guía de terceros; falta confirmarlo con un DNI real.
+   Cualquier otro: se reconocen los campos por su forma (DNI = 7 u 8 dígitos, nombres = solo letras), no por su posición.
+   Devuelve null si no logra identificar el DNI y los dos nombres. */
 function parseDni(txt) {
-  const p = txt.split('@').map(s => s.trim());
-  if (p.length < 5) return null;
-  let dni = p[4];
-  if (!/^\d{7,8}$/.test(dni)) dni = (p.slice(3).find(x => /^\d{7,8}$/.test(x))) || '';
-  return { apellido: p[1], nombre: p[2], dni };
+  const raw = String(txt || '').replace(/\0/g, '').trim();
+  const p = raw.split('@').map(s => s.trim());
+  if (p.length < 4) return null;
+  const limpio = s => String(s || '').replace(/[.\s]/g, ''); // algunas series traen el DNI con puntos
+  const esDni = s => /^\d{7,8}$/.test(limpio(s));
+  const esNombre = s => s.length > 1 && /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ][A-Za-zÁÉÍÓÚÜÑáéíóúüñ' .\-]*$/.test(s);
+  // Anterior (2009-2012): empieza con "@", 16 o 17 campos. DNI en 1, apellido en 4, nombre en 5.
+  if (p[0] === '' && (p.length === 16 || p.length === 17) && esDni(p[1]) && esNombre(p[4]) && esNombre(p[5]))
+    return { apellido: p[4], nombre: p[5], dni: limpio(p[1]), raw };
+  if (/^[MFX]$/i.test(p[3]) && esDni(p[4]) && esNombre(p[1]) && esNombre(p[2])) return { apellido: p[1], nombre: p[2], dni: limpio(p[4]), raw };
+  if (esDni(p[3]) && esNombre(p[1]) && esNombre(p[2])) return { apellido: p[1], nombre: p[2], dni: limpio(p[3]), raw };
+  const dni = p.find(esDni);
+  const nombres = p.filter(esNombre);
+  if (dni && nombres.length >= 2) return { apellido: nombres[0], nombre: nombres[1], dni: limpio(dni), raw };
+  return null;
+}
+
+// Cartel para un código que se leyó pero no se pudo interpretar como DNI: muestra el texto y deja copiarlo.
+function noLeido(txt, clave) {
+  busy = true;
+  bloqDni.dni = clave;
+  const el = $('res');
+  $('ov').classList.remove('hide');
+  el.className = 'warn bump';
+  el.innerHTML = ICO('warn') + '<b>NO PUDE LEER ESTE DNI</b><small>Cargá los datos a mano en el formulario.</small>' +
+    '<div class="rawt">' + esc(txt) + '</div>' +
+    '<div class="acts"><button class="b1" id="btnOk">Aceptar</button><button class="b2" id="btnCopiar">Copiar texto</button></div>';
+  $('btnOk').onclick = cerrar;
+  $('btnCopiar').onclick = async () => {
+    try { await navigator.clipboard.writeText(txt); $('btnCopiar').textContent = '¡Copiado!'; }
+    catch (e) { $('btnCopiar').textContent = 'No se pudo'; }
+  };
+  navigator.vibrate && navigator.vibrate([200, 100, 200]);
 }
 
 async function arrancar() {
@@ -503,8 +542,9 @@ async function arrancar() {
     if (busy) return; // hay un cartel abierto: no se escanea nada hasta cerrarlo
     if (modo === 'qr') return verificar(txt);
     const d = parseDni(txt);
-    if (!d || !d.nombre) return;
-    if (d.dni && d.dni === bloqDni.dni && Date.now() < bloqDni.hasta) return;
+    const clave = d ? d.dni : 'RAW:' + txt.slice(0, 30);
+    if (clave === bloqDni.dni && Date.now() < bloqDni.hasta) return;
+    if (!d) return noLeido(txt, clave);
     navigator.vibrate && navigator.vibrate(80);
     lockFrame();
     confirmarVenta(d);
